@@ -32,7 +32,7 @@ from src.python.ArduinoHandler import ArduinoHandler
 from src.python.Brightness import Brightness
 from src.python.JoystickProcess import JoystickProcess
 from src.python.AnalysisClass import Analysis
-from src.python.TrackAll import AllTracker
+
 
 
 # with jetson orin, cam can get up to 35 fps
@@ -424,16 +424,7 @@ class GUI:
             fg= 'white'
         )
 
-        trackall_button = Button(
-            Big_button_frame, 
-            text="Track All", 
-            command=self.trackall, 
-            height=1, 
-            width=20,
-            bg = "#40E0D0",
-            fg= 'white'
-        )
-
+  
 
         close_button = Button(master, 
             text="Exit", 
@@ -445,7 +436,7 @@ class GUI:
 
         status_button.grid(row=0, column=1,rowspan =3)
         track_button.grid(row=3, column=1,rowspan=2)
-        trackall_button.grid(row=5, column=1)
+        
 
         close_button.grid(row=7, column=0)
 
@@ -1229,37 +1220,6 @@ class GUI:
 
         
 
-
-    def trackall(self):
-        """
-        Initiates a AllTracker instance for tracking all microrobots
-
-        Args:
-            None
-
-        Returns:
-            None
-        """
-
-        alltracker = AllTracker(self.main_window, self.text_box,
-            CONTROL_PARAMS,
-            CAMERA_PARAMS,
-            STATUS_PARAMS,
-            self.get_widget(self.checkboxes_frame, "cuda_checkbox").var.get()
-        )
-        if (self.get_widget(self.video_option_frame, "live_checkbox").var.get()):
-            video_name = None
-        else:
-            video_name = self.external_file
-
-        robot_list = alltracker.main(video_name)
-
-        output_name = str(self.get_widget(self.video_record_frame, "output_name").get())
-
-        if self.get_widget(self.checkboxes_frame, "savepickle").var.get():
-            analyze = Analysis(CONTROL_PARAMS, CAMERA_PARAMS,STATUS_PARAMS,robot_list)
-            analyze.convert2pickle(output_name)
-            analyze.plot()
 
 
     def status(self):

@@ -1,0 +1,19 @@
+main.py
+
+- Classes
+    - GUI.py
+    - Tracker.py         --> Potentially Seperate Process
+    - AlgorithmHandler.py
+    - AcousticClass.py
+    - ArduinoHandler.py
+    - ContourProcessor.py
+    - FPSCounter.py
+    - HallEffect.py   --> Seperate Process
+    - RobotClass.py
+    - Velocity.py
+    - Joystick.py     
+
+ - New Classes
+    - MotorStageHandler.py
+    - JoystickCoil.py   --> Seperate Process
+    - JoystickStage.py  --> Seperate Process

@@ -1,15 +1,9 @@
-
 import time
 import numpy as np
 from multiprocessing import Process, Queue, Event
-from src.python.Joystick import Joystick
+from src.new_python_src.Joystick import Joystick
 
-#arduino signal: [typ, input1, input2, input3]
-#typ =1 : spherical ---> Roll [1, alpha, freq, gamma]
-#typ =2 : cartesian --> Orient [2, Bx, By, Bz]
-#typ =3 : Tweezer [3, Direction, Amplitude, None] where directon = [1,2,3,4] = [Up,Right,Down,Left]
-
-class JoystickProcess():
+class JoystickHandler:
     def __init__(self):
         self.joy = Joystick()
 
@@ -122,16 +116,4 @@ class JoystickProcess():
 
         self.joy.close()
         self.exit.set()
-
         
-        
-        
-               
-#if __name__ == "__main__":
-#    joystick_q = Queue()
-#    joystick_q.cancel_join_thread()
-#    JP = JoystickProcess()
-#    JP.start(joystick_q)
-    
-    
-    
