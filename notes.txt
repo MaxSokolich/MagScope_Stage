@@ -1,0 +1,48 @@
+Bugs:
+- cv2.cuda.inRange function does not exist for hsv thresholding. thus cuda does not work rn
+- still have sempahore leak on mac.
+
+
+ps5:
+-gernreal guide to xboxdrv and bluetooth
+https://www.gamingonlinux.com/2019/01/setting-up-a-bluetooth-controller-for-linux-gaming/
+
+
+— install hidraw and create the neccesary rules
+https://github.com/nowrep/dualsensectl
+
+
+— something about ps5 evdev rules
+https://wiki.archlinux.org/title/Gamepad#Playstation_5_(Dualsense)_controller
+
+-potentially a bluetooth to usb adapter or something
+https://www.supremegamegear.com/collections/ps5-controller-converter-adapter/products/mayflash-magic-s-pro-2-wireless-bluetooth-controller-usb-adapter-for-ps4-switch-windows-macos
+
+
+/etc/default/xboxdrv
+[xboxdrv]
+silent = true
+device-name = "Xbox 360 Wireless Receiver"
+mimic-xpad = true
+deadzone = 4000
+
+[xboxdrv-daemon]
+dbus = disabled
+
+
+Notes:
+- lots of continous aspects to this system. i.e functions that need to be external
+enclosed in a while loop to work properlly. This results in a large amount of 
+complexity:
+        0) read commands from keyboard and mouse for GUI
+        1) read frames from FLIR camera for tracking
+        2) read commands from USB joystick for controlling
+        3) read hall effect sensor magnetic field values for sensing
+
+        4) output arduino signal array via UART/Serial
+        5) output acoustic signal via RPi.GPIO
+        6) TBD: output stepper motor signal via I2C
+
+
+https://pyimagesearch.com/2020/03/25/how-to-configure-your-nvidia-jetson-nano-for-computer-vision-and-deep-learning/
+
