@@ -254,15 +254,23 @@ class Joystick:
 
 
 
-'''if __name__ == "__main__":
+if __name__ == "__main__":
     joy = Joystick()         #Initialize joystick
     while not joy.B():
         if joy.A():                   #Test state of the A button (1=pressed, 0=not pressed)
             print('A button pressed')
-        x_axis   = joy.leftX()        #X-axis of the left stick (values -1.0 to 1.0)
-        (x,y)    = joy.leftStick()    #Returns tuple containing left X and Y axes (values -1.0 to 1.0)
-        trigger  = joy.rightTrigger() #Right trigger position (values 0 to 1.0)
-        print(x_axis)
+        if not joy.rightX() == 0 or not joy.rightY() == 0:
+            print("R", joy.rightX())
+
+        if not joy.leftX() == 0 or not joy.leftY() == 0:
+            x_axis   = joy.leftX()        #X-axis of the left stick (values -1.0 to 1.0)
+            #(x,y)    = joy.leftStick()    #Returns tuple containing left X and Y axes (values -1.0 to 1.0)
+            #trigger  = joy.rightTrigger() #Right trigger position (values 0 to 1.0)
+            print("L", x_axis)
+
+        else:
+            print("zeroed")
         time.sleep(.05)
+
     joy.close()               
-    '''
+    

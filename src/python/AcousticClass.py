@@ -180,7 +180,7 @@ we want a reading from 0 V to voltage maximum
 map(low_resistance, high resistance, high voltage, low voltage)
 """
 
-if __name__ == "__main__":
+"""if __name__ == "__main__":
 
     AcousticMod = AcousticClass()
     AcousticMod.dp_activate()
@@ -192,4 +192,4 @@ if __name__ == "__main__":
     AcousticMod.stop()
     print("stopped waveform")
     AcousticMod.close()
-    AcousticMod.exit()
+    AcousticMod.exit()"""

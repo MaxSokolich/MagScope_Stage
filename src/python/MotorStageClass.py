@@ -22,3 +22,10 @@ class MotorStage:
         self.kit.motor1.throttle = 0
         self.kit.motor2.throttle = 0
         self.kit.motor3.throttle = 0
+
+
+if __name__ == "__main__":
+    stage = MotorStage()
+    stage.MoveY(1)
+    time.sleep(2)
+    stage.stop()
