@@ -10,13 +10,13 @@ class MotorStage:
         self.kit = MotorKit()
     
     def MoveX(self, direction):
-        self.kit.motor1.throttle = direction
+        self.kit.motor3.throttle = direction
         
     def MoveY(self, direction):
-        self.kit.motor2.throttle = direction
+        self.kit.motor1.throttle = direction
     
     def MoveZ(self, direction):
-        self.kit.motor3.throttle = direction
+        self.kit.motor2.throttle = direction
 
     def stop(self):
         self.kit.motor1.throttle = 0
@@ -24,8 +24,8 @@ class MotorStage:
         self.kit.motor3.throttle = 0
 
 
-if __name__ == "__main__":
+"""if __name__ == "__main__":
     stage = MotorStage()
     stage.MoveY(1)
     time.sleep(2)
-    stage.stop()
+    stage.stop()"""

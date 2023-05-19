@@ -70,20 +70,29 @@ class JoystickProcess():
                 #self.input1 = Bxl
                 #self.input2 = Byl
                 self.stage.MoveY(Bxl)
-                print("moveing stage Y")
+                self.stage.MoveX(Byl)
+                print("moveing stage XY")
+
             else:
                 self.stage.stop()
 
             #Right Trigger Function --> Positive Z
             if self.joy.rightTrigger() > 0:
-                self.typ = 2
-                self.input3 = self.joy.rightTrigger()
+                #self.typ = 2
+                #self.input3 = self.joy.rightTrigger()
+                ZZ = self.joy.rightTrigger()
+                self.stage.MoveZ(ZZ)
+            
+     
             
             #Left Trigger Function --> Negative Z
-            if self.joy.leftTrigger() > 0:
-                self.typ = 2
-                self.input3 = -self.joy.leftTrigger()
-                
+            elif self.joy.leftTrigger() > 0:
+                #self.typ = 2
+                #self.input3 = -self.joy.leftTrigger()
+                ZZ = self.joy.leftTrigger()
+                self.stage.MoveZ(-ZZ)
+            
+       
                 
 
             #D-Pad --> Tweezer Quick Field
