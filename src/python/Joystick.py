@@ -270,7 +270,7 @@ if __name__ == "__main__":
 
         else:
             print("zeroed")
-        time.sleep(.05)
+        time.sleep(.1)
 
     joy.close()               
     
