@@ -92,19 +92,21 @@ class JoystickProcess():
                 #self.typ = 2
                 #self.input1 = Bxl
                 #self.input2 = Byl
-                #outX = max(0.5,Bxl)
+                #outX = max(0.5,Bxl)gf
                 #outY = max(0.5,Byl)
                 self.stage.MoveY(Bxl)
                 self.stage.MoveX(Byl)
                 print("moveing stage XY")
-
-            
+            else:
+                self.stage.stop()
+            """
 
             #Right Trigger Function --> Positive Z
             elif self.joy.rightTrigger() > 0:
                 #self.typ = 2
                 #self.input3 = self.joy.rightTrigger()
                 ZZ = self.joy.rightTrigger()
+                ZZ = min(max(0.5, ZZ), .99)
                 self.stage.MoveZ(ZZ)
             
        
@@ -115,18 +117,19 @@ class JoystickProcess():
                 #self.typ = 2
                 #self.input3 = -self.joy.leftTrigger()
                 ZZ = self.joy.leftTrigger()
+                ZZ  = min(max(0.5,ZZ), .99)
                 self.stage.MoveZ(-ZZ)
             
             
             else:
                 self.stage.stop()  
-            
+            """
             #update queue
             actions = [self.typ, self.input1, self.input2, self.input3, self.acoustic_status]
             print(actions)
             #joystick_q.put(actions)
             #print(actions)
-            time.sleep(100/1000)  #need some sort of delay to not flood queue
+            time.sleep(10/1000)  #need some sort of delay to not flood queue
         
         #self.joy.close()
         print(" -- Joystick Process Terminated -- ")
