@@ -30,10 +30,9 @@ from src.python.HallEffect import HallEffect
 from src.python.Custom2DTracker import Tracker
 from src.python.ArduinoHandler import ArduinoHandler
 from src.python.Brightness import Brightness
-from src.python.JoystickProcess import JoystickProcess
 from src.python.AnalysisClass import Analysis
-
-
+from src.python.MotorStageClass import MotorStage
+from src.python.ControllerClass import Controller
 
 # with jetson orin, cam can get up to 35 fps
 
@@ -114,32 +113,29 @@ class GUI:
         #update sensor process/queue
         self.sensor = None
         self.sense_q = multiprocessing.Queue(1)
-        #self.sense_q.cancel_join_thread()
         self.checksensor = None
-        #self.main_window.after(10, self.CheckSensorPoll, self.sense_q)
+       
 
         #update joystick process/queue
         self.joystick = None
+        self.joystick_process = None
         self.joystick_q =  multiprocessing.Queue(1)
-        #self.joystick_q.cancel_join_thread()
         self.checkjoy = None
-        #self.main_window.after(10, self.CheckJoystickPoll, self.joystick_q)
+     
           
           
         # Tracker-related attributes
         self.arduino = arduino
         self.external_file = None
 
+
         
         #define instance of acoustic module
         self.AcousticModule = AcousticClass()
         self.AcousticModule.dp_activate()
 
-        #acoustic conditioning/logic
-        self.button_state = 0
-        self.last_state = 0
-        self.counter = 0
-        self.switch_state = 0
+        #define instance of MotorStage
+        self.stage = MotorStage()
 
         # Tkinter widget attributes
         self.text_box = Text(master, width=22, height=4)
@@ -1241,6 +1237,9 @@ class GUI:
 
         #self.tracker.robot_window.destroy()
         self.arduino.send(4, 0, 0, 0)
+
+        #ensure motors are off
+        self.stage.stop()
         
         #shutdown hall sensor readings
         if self.sensor is not None:
@@ -1249,7 +1248,6 @@ class GUI:
           
         
         if self.joystick is not None:
-            self.joystick.shutdown()
             self.main_window.after_cancel(self.checkjoy)
        
             
@@ -1277,17 +1275,22 @@ class GUI:
 
     def joy_proc(self):
         """
-        creates an instance of JoystickProcess class and starts a subprocess to read values
+        creates an instance of ControllerClass and starts a seperate process to read values
 
         Args:
             None
         Returns:
             None
         """
-        self.joystick = JoystickProcess()
-        self.joystick.start(self.joystick_q)
-        self.checkjoy = self.main_window.after(10, self.CheckJoystickPoll, self.joystick_q)
+        class MyController(Controller):
 
+            def __init__(self, **kwargs):
+                Controller.__init__(self, **kwargs)
+    
+        self.joystick = MyController(joystick_q=self.joystick_q,interface="/dev/input/js0", connecting_using_ds4drv=False)
+        self.joystick_process = multiprocessing.Process(target = self.joystick.listen, args = (self.joystick_q,))
+        self.joystick_process.start()
+        self.checkjoy = self.main_window.after(10, self.CheckJoystickPoll, self.joystick_q)
     
     def CheckJoystickPoll(self,j_queue):
         """
@@ -1295,7 +1298,7 @@ class GUI:
 
         Args:
             c_queue: queue object
-            joy_array: [typ, input1, input2, input3]
+            joy_array: [typ, input1, input2, input3,input4]
             input1(typ1 | typ2) = angle|  Bx
             input2(typ1 | typ2) = freq | By
             input3(typ1 | typ2) = gamma | Bz
@@ -1303,42 +1306,34 @@ class GUI:
             None
         """
         try:
-            joy_array = j_queue.get(0) # [typ,input1,input2,input3]
-            typ = joy_array[0]
-            
-            #Send arduino signal
-            if typ == 1:
-                #gamma toggle logic.
-                if joy_array[3] == 0:
-                    self.arduino.send(typ, joy_array[1], CONTROL_PARAMS["rolling_frequency"], joy_array[3]) #use gamma = 0
-                else: 
-                    self.arduino.send(typ, joy_array[1], CONTROL_PARAMS["rolling_frequency"], CONTROL_PARAMS["gamma"])
-            else:
-                self.arduino.send(typ, joy_array[1], joy_array[2], joy_array[3]) 
-                
-            #A Button Function --> Acoustic Module Toggle
-            self.button_state = joy_array[4]
-            if self.button_state != self.last_state:
-                if self.button_state == True:
-                    self.counter +=1
-            self.last_state = self.button_state
-            if self.counter %2 != 0 and self.switch_state !=0:
-                self.switch_state = 0
-                self.AcousticModule.start(ACOUSTIC_PARAMS["acoustic_freq"],ACOUSTIC_PARAMS["acoustic_amplitude"])
-                self.text_box.insert(END, " -- waveform ON -- \n")
-                self.text_box.see("end")
-                #print("acoustic: on")
-            elif self.counter %2 == 0 and self.switch_state !=1:
-                self.switch_state = 1
-                self.AcousticModule.stop()
-                self.text_box.insert(END, " -- waveform OFF -- \n")
-                self.text_box.see("end")
+            actions = j_queue.get(0)
 
+            if actions == False:
+                self.joystick_process.join()
+                
+            else:
+                if actions[0] == 0:
+                    x = actions[1]
+                    y = actions[2]
+                    z = actions[3]
+                    self.stage.MoveX(x)
+                    self.stage.MoveY(y)
+                    self.stage.MoveZ(z)
+                else:
+                    self.arduino.send(actions[0], actions[1], actions[2], actions[3])
+                
+                    
+                    
+            print("queue contents = ", actions)
+            
+            
+                
         except Empty:
             pass
         finally:
+            
             self.main_window.after(10,self.CheckJoystickPoll, j_queue)
-
+            
 
     def sensor_proc(self):
         """

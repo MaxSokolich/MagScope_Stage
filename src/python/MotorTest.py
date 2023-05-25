@@ -2,7 +2,7 @@
 import time
 import numpy as np
 from multiprocessing import Process, Queue, Event
-from Joystick import Joystick
+from tests.Joystick import Joystick
 from MotorStageClass import MotorStage
 #arduino signal: [typ, input1, input2, input3]
 #typ =1 : spherical ---> Roll [1, alpha, freq, gamma]
