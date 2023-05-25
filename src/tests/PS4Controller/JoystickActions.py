@@ -1,28 +1,38 @@
 import numpy as np
 from scipy import interpolate
 
-#typ =0 : stage motor actions [0,x, y, z]
-#typ =1 : spherical ---> Roll [1, alpha, freq, gamma]
-#typ =2 : cartesian --> Orient [2, Bx, By, Bz]
-#actions = [typ, input1, input2, input3, acoustic_status]
+
 
 class Actions:
     """
     Actions are inherited in the Controller class.
     In order to bind to the controller events, subclass the Controller class and
     override desired action events in this class.
+    
+    self.typ            : type of action applied 0,1,2,4 
+    self.Bx             : magnetic field in x
+    self.By             : magnetic field in y
+    self.Bz             : magnetic field in z
+    self.Mx             : stage motor in x
+    self.My             : stage motor in y
+    self.Mz             : stage motor in z
+    self.alpha          : rolling polar angle 
+    self.gamma          : rolling azimuthal angle
+    self.freq.          : rolling frequency
+    self.acoustic_status: acoustic module status on or off
     """
     def __init__(self,joystick_q):
         self.right_stick = [0,0]
         self.left_stick = [0,0]
         self.queue = joystick_q  #multiprocessing queue for storing joystick actions in seperate thread
         
-        #initlize coil actions
+        #initlize actions actions
         self.typ = 4
-        self.input1 = 0
-        self.input2 = 0
-        self.input3 = 0
+        self.Bx, self.By, self.Bz = 0,0,0
+        self.Mx, self.My, self.Mz = 0,0,0
+        self.alpha, self.gamma, self.freq = 0,0,0
         self.acoustic_status = 0
+        
         return
     
     def on_x_press(self):
@@ -30,7 +40,10 @@ class Actions:
         acoustic on
         """
         self.acoustic_status = 1
-        actions = [self.typ, self.input1, self.input2, self.input3, self.acoustic_status]
+        actions = [self.typ, self.Bx, self.By, self.Bz,
+                  self.Mx, self.My, self.Mz,
+                  self.alpha, self.gamma, self.freq,
+                  self.acoustic_status]
         self.queue.put(actions)
 
     def on_x_release(self):
@@ -38,7 +51,10 @@ class Actions:
         acoustic off
         """
         self.acoustic_status = 0
-        actions = [self.typ, self.input1, self.input2, self.input3, self.acoustic_status]
+        actions = [self.typ, self.Bx, self.By, self.Bz,
+                  self.Mx, self.My, self.Mz,
+                  self.alpha, self.gamma, self.freq,
+                  self.acoustic_status]
         self.queue.put(actions)
 
     def on_triangle_press(self):
@@ -46,11 +62,12 @@ class Actions:
         quick spin 10 Hz on
         """
         self.typ = 1
-        self.input1 = 0
-        self.input2 = 10
-        self.input3 = 0
-        
-        actions = [self.typ, self.input1, self.input2, self.input3, self.acoustic_status]
+        self.gamma = 0
+        self.freq = 10
+        actions = [self.typ, self.Bx, self.By, self.Bz,
+                  self.Mx, self.My, self.Mz,
+                  self.alpha, self.gamma, self.freq,
+                  self.acoustic_status]
         self.queue.put(actions)
        
 
@@ -59,11 +76,10 @@ class Actions:
         quick spin 10 Hz off
         """
         self.typ = 4
-        self.input1 = 0
-        self.input2 = 0
-        self.input3 = 0
-        
-        actions = [self.typ, self.input1, self.input2, self.input3, self.acoustic_status]
+        actions = [self.typ, self.Bx, self.By, self.Bz,
+                  self.Mx, self.My, self.Mz,
+                  self.alpha, self.gamma, self.freq,
+                  self.acoustic_status]
         self.queue.put(actions)
         
 
@@ -88,8 +104,11 @@ class Actions:
         """
         self.typ = 0
         f = interpolate.interp1d([-1,1], [0,1])  #need to map the -1 to 1 output to 0-1
-        self.input3 = -round(float(f(value/32767)),3)
-        actions = [self.typ, self.input1, self.input2, self.input3, self.acoustic_status]
+        self.Mz = -round(float(f(value/32767)),3)
+        actions = [self.typ, self.Bx, self.By, self.Bz,
+                  self.Mx, self.My, self.Mz,
+                  self.alpha, self.gamma, self.freq,
+                  self.acoustic_status]
         self.queue.put(actions)
         
     def on_L2_release(self):
@@ -97,8 +116,11 @@ class Actions:
         negative Z stage off
         """
         self.typ = 0
-        self.input3 = 0
-        actions = [self.typ, self.input1, self.input2, self.input3, self.acoustic_status]
+        self.Mz = 0
+        actions = [self.typ, self.Bx, self.By, self.Bz,
+                  self.Mx, self.My, self.Mz,
+                  self.alpha, self.gamma, self.freq,
+                  self.acoustic_status]
         self.queue.put(actions)
         
 
@@ -108,8 +130,11 @@ class Actions:
         """
         self.typ = 0
         f = interpolate.interp1d([-1,1], [0,1])  #need to map the -1 to 1 output to 0-1
-        self.input3 = round(float(f(value/32767)),3)
-        actions = [self.typ, self.input1, self.input2, self.input3, self.acoustic_status]
+        self.Mz = round(float(f(value/32767)),3)
+        actions = [self.typ, self.Bx, self.By, self.Bz,
+                  self.Mx, self.My, self.Mz,
+                  self.alpha, self.gamma, self.freq,
+                  self.acoustic_status]
         self.queue.put(actions)
 
     def on_R2_release(self):
@@ -117,8 +142,11 @@ class Actions:
         positive Z stage off
         """
         self.typ = 0
-        self.input3 = 0
-        actions = [self.typ, self.input1, self.input2, self.input3, self.acoustic_status]
+        self.Mz = 0
+        actions = [self.typ, self.Bx, self.By, self.Bz,
+                  self.Mx, self.My, self.Mz,
+                  self.alpha, self.gamma, self.freq,
+                  self.acoustic_status]
         self.queue.put(actions)
 
     def on_up_arrow_press(self):
@@ -126,9 +154,11 @@ class Actions:
         postitive Y stage motor on 
         """
         self.typ = 0
-        self.input1 = 0
-        self.input2 = 1
-        actions = [self.typ, self.input1, self.input2, self.input3, self.acoustic_status]
+        self.My = 1
+        actions = [self.typ, self.Bx, self.By, self.Bz,
+                  self.Mx, self.My, self.Mz,
+                  self.alpha, self.gamma, self.freq,
+                  self.acoustic_status]
         self.queue.put(actions)
         
     def on_up_down_arrow_release(self):
@@ -136,9 +166,11 @@ class Actions:
         Y stage motor off 
         """
         self.typ = 0
-        self.input1 = 0
-        self.input2 = 0
-        actions = [self.typ, self.input1, self.input2, self.input3, self.acoustic_status]
+        self.My = 0
+        actions = [self.typ, self.Bx, self.By, self.Bz,
+                  self.Mx, self.My, self.Mz,
+                  self.alpha, self.gamma, self.freq,
+                  self.acoustic_status]
         self.queue.put(actions)
         
     def on_down_arrow_press(self):
@@ -146,9 +178,11 @@ class Actions:
         negative Y stage motor on
         """
         self.typ = 0
-        self.input1 = 0
-        self.input2 = -1
-        actions = [self.typ, self.input1, self.input2, self.input3, self.acoustic_status]
+        self.My = -1
+        actions = [self.typ, self.Bx, self.By, self.Bz,
+                  self.Mx, self.My, self.Mz,
+                  self.alpha, self.gamma, self.freq,
+                  self.acoustic_status]
         self.queue.put(actions)
 
     def on_left_arrow_press(self):
@@ -156,9 +190,11 @@ class Actions:
         negative X stage motor on
         """
         self.typ = 0
-        self.input1 = -1
-        self.input2 = 0
-        actions = [self.typ, self.input1, self.input2, self.input3, self.acoustic_status]
+        self.Mx = -1
+        actions = [self.typ, self.Bx, self.By, self.Bz,
+                  self.Mx, self.My, self.Mz,
+                  self.alpha, self.gamma, self.freq,
+                  self.acoustic_status]
         self.queue.put(actions)
 
     def on_left_right_arrow_release(self):
@@ -166,9 +202,11 @@ class Actions:
         X stage motor off
         """
         self.typ = 0
-        self.input1 = 0
-        self.input2 = 0
-        actions = [self.typ, self.input1, self.input2, self.input3, self.acoustic_status]
+        self.Mx = 0
+        actions = [self.typ, self.Bx, self.By, self.Bz,
+                  self.Mx, self.My, self.Mz,
+                  self.alpha, self.gamma, self.freq,
+                  self.acoustic_status]
         self.queue.put(actions)
         
 
@@ -177,9 +215,11 @@ class Actions:
         positive X stage motor on
         """
         self.typ = 0
-        self.input1 = 1
-        self.input2 = 0
-        actions = [self.typ, self.input1, self.input2, self.input3, self.acoustic_status]
+        self.Mx = 1
+        actions = [self.typ, self.Bx, self.By, self.Bz,
+                  self.Mx, self.My, self.Mz,
+                  self.alpha, self.gamma, self.freq,
+                  self.acoustic_status]
         self.queue.put(actions)
     
 
@@ -194,29 +234,29 @@ class Actions:
         y = -round(self.right_stick[1]/32767,3)
         if self.right_stick == [0,0]:
             self.typ = 4
-            self.input1 = 0
-            self.input2 = 0
-            self.input3 = 0
 
         elif x == 0 and y > 0:
             self.typ = 1
-            self.input1 = 90
-            self.input2 = int(np.sqrt((x)**2 + (y)**2)*20)
-            self.input3 = 90
+            self.alpha = np.pi/2
+            self.gamma = int(np.sqrt((x)**2 + (y)**2)*20)
+            self.freq = 90
             
         elif x == 0 and y < 0:
             self.typ = 1
-            self.input1 = -90
-            self.input2 = int(np.sqrt((x)**2 + (y)**2)*20)
-            self.input3 = 90
+            self.alpha = -np.pi/2
+            self.gamma = 90
+            self.freq = int(np.sqrt((x)**2 + (y)**2)*20)
         else:
             angle = round(np.arctan2(y,x),3)
             self.typ = 1
-            self.input1 = angle+ np.pi/2
-            self.input2 = int(np.sqrt((x)**2 + (y)**2)*20)
-            self.input3 = 90
-        
-        actions = [self.typ, self.input1, self.input2, self.input3, self.acoustic_status]
+            self.alpha = angle+ np.pi/2
+            self.gamma = 90
+            self.freq = int(np.sqrt((x)**2 + (y)**2)*20)
+       
+        actions = [self.typ, self.Bx, self.By, self.Bz,
+                  self.Mx, self.My, self.Mz,
+                  self.alpha, self.gamma, self.freq,
+                  self.acoustic_status]
         self.queue.put(actions)
     
 
@@ -229,18 +269,15 @@ class Actions:
         """
         x = round(self.left_stick[0],3)
         y = -round(self.left_stick[1],3)
-        if self.left_stick == [0,0]:
-            self.typ = 4
-            self.input1 = 0
-            self.input2 = 0
-            self.input3 = 0
-        else:
-            self.typ = 2
-            self.input1 = round(x/32767,3)
-            self.input2 = round(y/32767,3)
-            
-
-        actions = [self.typ, self.input1, self.input2, self.input3, self.acoustic_status]
+        
+        self.typ = 2
+        self.Bx = round(x/32767,3)
+        self.By = round(y/32767,3)
+         
+        actions = [self.typ, self.Bx, self.By, self.Bz,
+                  self.Mx, self.My, self.Mz,
+                  self.alpha, self.gamma, self.freq,
+                  self.acoustic_status]
         self.queue.put(actions)
     
     def on_L1_press(self):
@@ -248,8 +285,11 @@ class Actions:
         coil orient -Z on
         """
         self.typ = 2
-        self.input3 = -1 #Z
-        actions = [self.typ, self.input1, self.input2, self.input3, self.acoustic_status]
+        self.Bz = -1
+        actions = [self.typ, self.Bx, self.By, self.Bz,
+                  self.Mx, self.My, self.Mz,
+                  self.alpha, self.gamma, self.freq,
+                  self.acoustic_status]
         self.queue.put(actions)
         
 
@@ -258,8 +298,11 @@ class Actions:
         coil orient -Z off
         """
         self.typ = 2
-        self.input3 = 0
-        actions = [self.typ, self.input1, self.input2, self.input3, self.acoustic_status]
+        self.Bz = 0
+        actions = [self.typ, self.Bx, self.By, self.Bz,
+                  self.Mx, self.My, self.Mz,
+                  self.alpha, self.gamma, self.freq,
+                  self.acoustic_status]
         self.queue.put(actions)
         
     def on_R1_press(self):
@@ -267,8 +310,11 @@ class Actions:
         coil orient +Z on
         """
         self.typ = 2
-        self.input3 = 1 #Z
-        actions = [self.typ, self.input1, self.input2, self.input3, self.acoustic_status]
+        self.Bz = 1
+        actions = [self.typ, self.Bx, self.By, self.Bz,
+                  self.Mx, self.My, self.Mz,
+                  self.alpha, self.gamma, self.freq,
+                  self.acoustic_status]
         self.queue.put(actions)
 
     def on_R1_release(self):
@@ -276,8 +322,11 @@ class Actions:
         coil orient +Z off
         """
         self.typ = 2
-        self.input3 = 0 #-Z
-        actions = [self.typ, self.input1, self.input2, self.input3, self.acoustic_status]
+        self.Bz = 0
+        actions = [self.typ, self.Bx, self.By, self.Bz,
+                  self.Mx, self.My, self.Mz,
+                  self.alpha, self.gamma, self.freq,
+                  self.acoustic_status]
         self.queue.put(actions)
 
     def on_L3_up(self, value):
