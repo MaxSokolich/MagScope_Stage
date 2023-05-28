@@ -1,7 +1,6 @@
 from pySerialTransfer import pySerialTransfer as txfer
 from pySerialTransfer.pySerialTransfer import InvalidSerialPort
-from tkinter import Tk
-from tkinter import *
+
 
 class ArduinoHandler:
     """
@@ -47,26 +46,23 @@ class ArduinoHandler:
                 f"Connection already initialized at port {self.port}, new port {port} ignored"
             )
 
-    def send(self, typ: float, input1: float, input2: float, input3: float) -> None:
+    def send(float, Bx: float, By: float, Bz: float, alpha: float, gamma: float, freq: float) -> None:
         """
         Applies a pipeline of preprocessing to a cropped frame, then gets the contours from the
         cropped, preprocesed image.
 
         Args:
-            cropped_frame:  cropped frame img containing the microbot, indicated by list of coords
-            bot_blur_list:  list of previous blur values from each frame, originally contained=
-                            in a Robot class
-            debug_mode: Optional debugging boolean; if True, debugging information is printed
+            actions = [Bx, By, Bz, alpha, gamma, freq]
         Returns:
             List of contours
         """
         if self.conn is None:
             print("Connection not initialized, message not sent")
         else:
-            data = [float(typ), float(input1), float(input2), float(input3)]
+            data = [float(Bx), float(By), float(Bz), float(alpha), float(gamma), float(freq)]
             message = self.conn.tx_obj(data)
             self.conn.send(message)
-            print("Data sent:", [float(typ), float(input1), float(input2), float(input3) ])
+            print("Data sent:", data)
 
     def close(self) -> None:
         """
@@ -82,3 +78,4 @@ class ArduinoHandler:
         else:
             print(f"Closing connection at port {self.port}")
             self.conn.close()
+            self.conn.send(self.conn.tx_obj([0,0,0,0,0,0]))

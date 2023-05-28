@@ -1,7 +1,7 @@
 from queue import Empty
 from ControllerClass import Controller
 from ArduinoHandler import ArduinoHandler
-from MotorStageClass import MotorStage
+
 
 from multiprocessing import Process, Queue, Event
 #from src.python.AcousticClass import AcousticClass
@@ -17,7 +17,7 @@ class MyController(Controller):
 
 if __name__ == "__main__":
     #create instance of motor stage class
-    stage = MotorStage()
+    
 
     #create instance and connect to arduino module
     PORT = "/dev/ttyACM0"
@@ -37,12 +37,22 @@ if __name__ == "__main__":
             if actions == False:
                 break
             else:
-                arduino.send(actions)
+                Bx = actions[0]
+                By = actions[1]
+                Bz = actions[2]
+                Mx = actions[3]
+                My = actions[4]
+                Mz =  actions[5]
+                alpha = actions[6]
+                gamma = actions[7]
+                freq =  actions[8]
+                acoustic_status = actions[9]
+                print('Bx:{} By:{},Bz:{},Mx:{},My:{},Mz:{},alpha:{},gamma:{},freq:{},acoustic:{}'.format(Bx,By,Bz,Mx,My,Mz,alpha,gamma,freq,acoustic_status))
         except Empty:
             pass
  
 
     joystick_process.join()
-    stage.stop()
+    
 
 

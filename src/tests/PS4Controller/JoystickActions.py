@@ -1,6 +1,7 @@
 import numpy as np
+'''
 from scipy import interpolate
-
+'''
 
 
 class Actions:
@@ -9,7 +10,7 @@ class Actions:
     In order to bind to the controller events, subclass the Controller class and
     override desired action events in this class.
     
-    self.typ            : type of action applied 0,1,2,4 
+    
     self.Bx             : magnetic field in x
     self.By             : magnetic field in y
     self.Bz             : magnetic field in z
@@ -27,7 +28,6 @@ class Actions:
         self.queue = joystick_q  #multiprocessing queue for storing joystick actions in seperate thread
         
         #initlize actions actions
-        self.typ = 4
         self.Bx, self.By, self.Bz = 0,0,0
         self.Mx, self.My, self.Mz = 0,0,0
         self.alpha, self.gamma, self.freq = 0,0,0
@@ -40,7 +40,7 @@ class Actions:
         acoustic on
         """
         self.acoustic_status = 1
-        actions = [self.typ, self.Bx, self.By, self.Bz,
+        actions = [self.Bx, self.By, self.Bz,
                   self.Mx, self.My, self.Mz,
                   self.alpha, self.gamma, self.freq,
                   self.acoustic_status]
@@ -51,7 +51,7 @@ class Actions:
         acoustic off
         """
         self.acoustic_status = 0
-        actions = [self.typ, self.Bx, self.By, self.Bz,
+        actions = [self.Bx, self.By, self.Bz,
                   self.Mx, self.My, self.Mz,
                   self.alpha, self.gamma, self.freq,
                   self.acoustic_status]
@@ -61,10 +61,9 @@ class Actions:
         """
         quick spin 10 Hz on
         """
-        self.typ = 1
         self.gamma = 0
         self.freq = 10
-        actions = [self.typ, self.Bx, self.By, self.Bz,
+        actions = [self.Bx, self.By, self.Bz,
                   self.Mx, self.My, self.Mz,
                   self.alpha, self.gamma, self.freq,
                   self.acoustic_status]
@@ -75,8 +74,9 @@ class Actions:
         """
         quick spin 10 Hz off
         """
-        self.typ = 4
-        actions = [self.typ, self.Bx, self.By, self.Bz,
+        self.gamma = 0
+        self.freq = 0
+        actions = [self.Bx, self.By, self.Bz,
                   self.Mx, self.My, self.Mz,
                   self.alpha, self.gamma, self.freq,
                   self.acoustic_status]
@@ -103,9 +103,12 @@ class Actions:
         negative Z stage on
         """
         self.typ = 0
+        '''
         f = interpolate.interp1d([-1,1], [0,1])  #need to map the -1 to 1 output to 0-1
         self.Mz = -round(float(f(value/32767)),3)
-        actions = [self.typ, self.Bx, self.By, self.Bz,
+        '''
+        self.Mz = -value
+        actions = [self.Bx, self.By, self.Bz,
                   self.Mx, self.My, self.Mz,
                   self.alpha, self.gamma, self.freq,
                   self.acoustic_status]
@@ -115,9 +118,8 @@ class Actions:
         """
         negative Z stage off
         """
-        self.typ = 0
         self.Mz = 0
-        actions = [self.typ, self.Bx, self.By, self.Bz,
+        actions = [self.Bx, self.By, self.Bz,
                   self.Mx, self.My, self.Mz,
                   self.alpha, self.gamma, self.freq,
                   self.acoustic_status]
@@ -128,10 +130,12 @@ class Actions:
         """
         positive Z stage on
         """
-        self.typ = 0
+        '''
         f = interpolate.interp1d([-1,1], [0,1])  #need to map the -1 to 1 output to 0-1
         self.Mz = round(float(f(value/32767)),3)
-        actions = [self.typ, self.Bx, self.By, self.Bz,
+        '''
+        self.Mz = value
+        actions = [self.Bx, self.By, self.Bz,
                   self.Mx, self.My, self.Mz,
                   self.alpha, self.gamma, self.freq,
                   self.acoustic_status]
@@ -141,9 +145,9 @@ class Actions:
         """
         positive Z stage off
         """
-        self.typ = 0
+        
         self.Mz = 0
-        actions = [self.typ, self.Bx, self.By, self.Bz,
+        actions = [self.Bx, self.By, self.Bz,
                   self.Mx, self.My, self.Mz,
                   self.alpha, self.gamma, self.freq,
                   self.acoustic_status]
@@ -153,9 +157,9 @@ class Actions:
         """
         postitive Y stage motor on 
         """
-        self.typ = 0
+        
         self.My = 1
-        actions = [self.typ, self.Bx, self.By, self.Bz,
+        actions = [self.Bx, self.By, self.Bz,
                   self.Mx, self.My, self.Mz,
                   self.alpha, self.gamma, self.freq,
                   self.acoustic_status]
@@ -165,9 +169,8 @@ class Actions:
         """
         Y stage motor off 
         """
-        self.typ = 0
         self.My = 0
-        actions = [self.typ, self.Bx, self.By, self.Bz,
+        actions = [self.Bx, self.By, self.Bz,
                   self.Mx, self.My, self.Mz,
                   self.alpha, self.gamma, self.freq,
                   self.acoustic_status]
@@ -177,9 +180,8 @@ class Actions:
         """
         negative Y stage motor on
         """
-        self.typ = 0
         self.My = -1
-        actions = [self.typ, self.Bx, self.By, self.Bz,
+        actions = [self.Bx, self.By, self.Bz,
                   self.Mx, self.My, self.Mz,
                   self.alpha, self.gamma, self.freq,
                   self.acoustic_status]
@@ -189,9 +191,8 @@ class Actions:
         """
         negative X stage motor on
         """
-        self.typ = 0
         self.Mx = -1
-        actions = [self.typ, self.Bx, self.By, self.Bz,
+        actions = [self.Bx, self.By, self.Bz,
                   self.Mx, self.My, self.Mz,
                   self.alpha, self.gamma, self.freq,
                   self.acoustic_status]
@@ -201,9 +202,8 @@ class Actions:
         """
         X stage motor off
         """
-        self.typ = 0
         self.Mx = 0
-        actions = [self.typ, self.Bx, self.By, self.Bz,
+        actions = [self.Bx, self.By, self.Bz,
                   self.Mx, self.My, self.Mz,
                   self.alpha, self.gamma, self.freq,
                   self.acoustic_status]
@@ -214,9 +214,8 @@ class Actions:
         """
         positive X stage motor on
         """
-        self.typ = 0
         self.Mx = 1
-        actions = [self.typ, self.Bx, self.By, self.Bz,
+        actions = [self.Bx, self.By, self.Bz,
                   self.Mx, self.My, self.Mz,
                   self.alpha, self.gamma, self.freq,
                   self.acoustic_status]
@@ -233,27 +232,26 @@ class Actions:
         x = round(self.right_stick[0]/32767,3)
         y = -round(self.right_stick[1]/32767,3)
         if self.right_stick == [0,0]:
-            self.typ = 4
+            self.alpha = 0
+            self.gamma = 0
+            self.freq = 0
 
         elif x == 0 and y > 0:
-            self.typ = 1
             self.alpha = np.pi/2
-            self.gamma = int(np.sqrt((x)**2 + (y)**2)*20)
-            self.freq = 90
+            self.gamma = 90
+            self.freq = int(np.sqrt((x)**2 + (y)**2)*20)
             
         elif x == 0 and y < 0:
-            self.typ = 1
             self.alpha = -np.pi/2
             self.gamma = 90
             self.freq = int(np.sqrt((x)**2 + (y)**2)*20)
         else:
-            angle = round(np.arctan2(y,x),3)
-            self.typ = 1
-            self.alpha = angle+ np.pi/2
+            angle = np.arctan2(y,x) + np.pi/2
+            self.alpha = round(angle,3)
             self.gamma = 90
             self.freq = int(np.sqrt((x)**2 + (y)**2)*20)
        
-        actions = [self.typ, self.Bx, self.By, self.Bz,
+        actions = [self.Bx, self.By, self.Bz,
                   self.Mx, self.My, self.Mz,
                   self.alpha, self.gamma, self.freq,
                   self.acoustic_status]
@@ -270,11 +268,10 @@ class Actions:
         x = round(self.left_stick[0],3)
         y = -round(self.left_stick[1],3)
         
-        self.typ = 2
         self.Bx = round(x/32767,3)
         self.By = round(y/32767,3)
          
-        actions = [self.typ, self.Bx, self.By, self.Bz,
+        actions = [self.Bx, self.By, self.Bz,
                   self.Mx, self.My, self.Mz,
                   self.alpha, self.gamma, self.freq,
                   self.acoustic_status]
@@ -284,9 +281,8 @@ class Actions:
         """
         coil orient -Z on
         """
-        self.typ = 2
         self.Bz = -1
-        actions = [self.typ, self.Bx, self.By, self.Bz,
+        actions = [self.Bx, self.By, self.Bz,
                   self.Mx, self.My, self.Mz,
                   self.alpha, self.gamma, self.freq,
                   self.acoustic_status]
@@ -297,9 +293,8 @@ class Actions:
         """
         coil orient -Z off
         """
-        self.typ = 2
         self.Bz = 0
-        actions = [self.typ, self.Bx, self.By, self.Bz,
+        actions = [self.Bx, self.By, self.Bz,
                   self.Mx, self.My, self.Mz,
                   self.alpha, self.gamma, self.freq,
                   self.acoustic_status]
@@ -309,9 +304,8 @@ class Actions:
         """
         coil orient +Z on
         """
-        self.typ = 2
         self.Bz = 1
-        actions = [self.typ, self.Bx, self.By, self.Bz,
+        actions = [self.Bx, self.By, self.Bz,
                   self.Mx, self.My, self.Mz,
                   self.alpha, self.gamma, self.freq,
                   self.acoustic_status]
@@ -321,9 +315,8 @@ class Actions:
         """
         coil orient +Z off
         """
-        self.typ = 2
         self.Bz = 0
-        actions = [self.typ, self.Bx, self.By, self.Bz,
+        actions = [self.Bx, self.By, self.Bz,
                   self.Mx, self.My, self.Mz,
                   self.alpha, self.gamma, self.freq,
                   self.acoustic_status]
