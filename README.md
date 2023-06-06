@@ -1,5 +1,10 @@
 new repo with updated scripts for controlling 3D stage with DC motors. NOT FINISHED.
 
+this new repo will use the new action commands instead of switching between typ: 
+(the data that is sent from Jetson/Python to Arduino/c++ over Serial/UART using PySerialTransfer libary). This results in alot of code refactoring which has not been completed yet.
+
+action = [Bx, By, Bz, alpha, gamma, freq]
+
 # MagScope System
 a repository consisting of all scripts neccesary to use the mag scope system. The magscope system is an edge computing platform and custom device capable of a variety of microrobotic manipulation operations. The device consists of a single board computer (Jetson AGX Orin) with a python GUI used to control various manipulation setups. The system is named MagScope which combines the words magnetic and microscope. 
 
