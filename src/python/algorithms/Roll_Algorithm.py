@@ -97,6 +97,7 @@ class Roll_Algorithm:
                 "rolling")
 
             
-            arduino.send(typ,input1,input2,input3)
+            #arduino.send(typ,input1,input2,input3)
+            arduino.send(0,0,0, input1, input3, input2)
 
             

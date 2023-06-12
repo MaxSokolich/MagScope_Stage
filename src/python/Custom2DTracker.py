@@ -106,9 +106,9 @@ class Tracker:
             bot_loc = [x, y]
 
             #create upper and lower bounds from point click color
-            pixel_color = cv2.cvtColor(params["frame"],cv2.COLOR_BGR2HSV)[y,x]
-            self.textbox.insert(END,"pixel color: {}\n".format(pixel_color))
-            self.textbox.see("end")
+            #pixel_color = cv2.cvtColor(params["frame"],cv2.COLOR_BGR2HSV)[y,x]
+            #self.textbox.insert(END,"pixel color: {}\n".format(pixel_color))
+            #self.textbox.see("end")
             
             #print([x,y])
             '''
@@ -174,7 +174,7 @@ class Tracker:
             del self.robot_var_list[:]
             del self.robot_list[:]
             if params["arduino"].conn is not None:
-                params["arduino"].send(4, 0, 0, 0)
+                params["arduino"].send(0,0,0, 0, 0, 0)
 
             #reset robot checkboxes
             self.robot_window = Frame(master= self.main_window)#Toplevel(self.main_window)
@@ -445,6 +445,7 @@ class Tracker:
             None
         """
         self.get_fps(fps, frame)
+        #frame = cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
 
         if len(self.robot_list) > 0:
             color = plt.cm.rainbow(np.linspace(0, 1, self.num_bots)) * 255
@@ -689,7 +690,7 @@ class Tracker:
         cam.release()
         
         cv2.destroyAllWindows()
-        arduino.send(4, 0, 0, 0)
+        arduino.send(0,0,0, 0, 0, 0)
         for w in self.robot_checklist_list: w.destroy()
         self.robot_window.destroy()
         del self.robot_checklist_list[:]

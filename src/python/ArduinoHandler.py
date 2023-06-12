@@ -1,7 +1,6 @@
 from pySerialTransfer import pySerialTransfer as txfer
 from pySerialTransfer.pySerialTransfer import InvalidSerialPort
-from tkinter import Tk
-from tkinter import *
+import time
 
 class ArduinoHandler:
     """
@@ -24,19 +23,14 @@ class ArduinoHandler:
         Initializes a connection to an arduino at a specified port. If successful,
         the conn and port attributes are updated
 
-        Args:
-            cropped_frame:  cropped frame img containing the microbot, indicated by list of coords
-            bot_blur_list:  list of previous blur values from each frame, originally contained=
-                            in a Robot class
-            debug_mode: Optional debugging boolean; if True, debugging information is printed
-        Returns:
-            List of contours
+       
         """
         if self.conn is None:
             try:
                 self.conn = txfer.SerialTransfer(port)
                 self.port = port
                 self.conn.open()
+                time.sleep(5)
                 print(f" -- Arduino Connection initialized using port {port} --")
             except InvalidSerialPort:
                 print("Could not connect to arduino, disabling")
@@ -47,26 +41,21 @@ class ArduinoHandler:
                 f"Connection already initialized at port {self.port}, new port {port} ignored"
             )
 
-    def send(self, typ: float, input1: float, input2: float, input3: float) -> None:
+    def send(self, Bx: float, By: float, Bz: float, alpha: float, gamma: float, freq: float) -> None:
         """
-        Applies a pipeline of preprocessing to a cropped frame, then gets the contours from the
-        cropped, preprocesed image.
+        sends action commands to arduino
 
-        Args:
-            cropped_frame:  cropped frame img containing the microbot, indicated by list of coords
-            bot_blur_list:  list of previous blur values from each frame, originally contained=
-                            in a Robot class
-            debug_mode: Optional debugging boolean; if True, debugging information is printed
-        Returns:
-            List of contours
+         Args:
+            actions = [Bx, By, Bz, alpha, gamma, freq]
+
         """
         if self.conn is None:
             print("Connection not initialized, message not sent")
         else:
-            data = [float(typ), float(input1), float(input2), float(input3)]
+            data = [float(Bx), float(By), float(Bz), float(alpha), float(gamma), float(freq)]
             message = self.conn.tx_obj(data)
             self.conn.send(message)
-            print("Data sent:", [float(typ), float(input1), float(input2), float(input3) ])
+            print("Data sent:", data)
 
     def close(self) -> None:
         """
@@ -81,4 +70,21 @@ class ArduinoHandler:
             print("Connection not initialized, ignoring close() call")
         else:
             print(f"Closing connection at port {self.port}")
+            self.send(0,0,0,0,0,0)
             self.conn.close()
+            
+
+
+"""if __name__ == "__main__":
+    PORT = "/dev/ttyACM0"
+    arduino = MyArduino()
+    arduino.connect(PORT)
+
+    arduino.send(0,0,0,3.1,90,10)
+    print("sending")
+    time.sleep(5)
+    arduino.send(0,0,0,0,0,0)
+    print("zeroing")
+    arduino.close()"""
+    
+    

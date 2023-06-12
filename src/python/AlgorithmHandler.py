@@ -54,7 +54,7 @@ class AlgorithmHandler:
     def __init__(self):
         #every time middle mouse button is pressed, it will reinitiate the following classes
         self.Roll_Robot = Roll_Algorithm()
-        self.Orient_Robot = PID_Algorithm()#Orient_Algorithm()
+        self.Orient_Robot = Orient_Algorithm()
         self.Multi_Agent_Robot = Multi_Agent_Algorithm()
         self.PID_Robot = PID_Algorithm()
         

@@ -15,6 +15,7 @@ or
 pix - 2448 x 2048 color
 maxframerate = 35 (actually 24)
 """
+import threading
 import colorsys
 from queue import Empty
 import multiprocessing
@@ -31,8 +32,8 @@ from src.python.Custom2DTracker import Tracker
 from src.python.ArduinoHandler import ArduinoHandler
 from src.python.Brightness import Brightness
 from src.python.AnalysisClass import Analysis
-from src.python.MotorStageClass import MotorStage
-from src.python.ControllerClass import Controller
+
+from src.python.PS4_Windows import MyController
 
 # with jetson orin, cam can get up to 35 fps
 
@@ -45,8 +46,8 @@ PID_PARAMS = {
 }
 
 CONTROL_PARAMS = {
-    "lower_thresh": np.array([0,0,0]),  #HSV
-    "upper_thresh": np.array([180,255,140]),  #HSV   #130/150
+    "lower_thresh": 0,#np.array([0,0,0]),  #HSV
+    "upper_thresh": 100,#np.array([180,255,140]),  #HSV   #130/150
     "blur_thresh": 100,
     "initial_crop": 100,       #intial size of "screenshot" cropped frame 
     "tracking_frame": 1,            #cropped frame dimensions mulitplier
@@ -135,7 +136,7 @@ class GUI:
         self.AcousticModule.dp_activate()
 
         #define instance of MotorStage
-        self.stage = MotorStage()
+
 
         # Tkinter widget attributes
         self.text_box = Text(master, width=22, height=4)
@@ -870,7 +871,7 @@ class GUI:
             master=window4,
             label="Frame Rate",
             from_=1,
-            to=24,
+            to=65,
             resolution=1,
             variable=frame_rate,
             width=20,
@@ -1236,10 +1237,10 @@ class GUI:
         self.text_box.see("end")
 
         #self.tracker.robot_window.destroy()
-        self.arduino.send(4, 0, 0, 0)
+        self.arduino.send(0,0,0, 0, 0, 0)
 
         #ensure motors are off
-        self.stage.stop()
+        
         
         #shutdown hall sensor readings
         if self.sensor is not None:
@@ -1282,13 +1283,10 @@ class GUI:
         Returns:
             None
         """
-        class MyController(Controller):
-
-            def __init__(self, **kwargs):
-                Controller.__init__(self, **kwargs)
     
-        self.joystick = MyController(joystick_q=self.joystick_q,interface="/dev/input/js0", connecting_using_ds4drv=False)
-        self.joystick_process = multiprocessing.Process(target = self.joystick.listen, args = (self.joystick_q,))
+    
+        self.joystick = MyController()
+        self.joystick_process = multiprocessing.Process(target = self.joystick.run, args = (None,self.joystick_q))
         self.joystick_process.start()
         self.checkjoy = self.main_window.after(10, self.CheckJoystickPoll, self.joystick_q)
     
@@ -1308,23 +1306,14 @@ class GUI:
         try:
             actions = j_queue.get(0)
 
-            if actions == False:
-                self.joystick_process.join()
+           
                 
-            else:
-                if actions[0] == 0:
-                    x = actions[1]
-                    y = actions[2]
-                    z = actions[3]
-                    self.stage.MoveX(x)
-                    self.stage.MoveY(y)
-                    self.stage.MoveZ(z)
-                else:
-                    self.arduino.send(actions[0], actions[1], actions[2], actions[3])
+            
+            self.arduino.send(actions[0], actions[1], actions[2], actions[6], actions[7], actions[8])
                 
                     
                     
-            print("queue contents = ", actions)
+           
             
             
                 
