@@ -634,11 +634,12 @@ class Tracker:
                     rec_start_time = time.time()
 
                 if result is None:
+                    print(resize_ratio)
                     result = cv2.VideoWriter(
                         output_name + ".mp4",
                         cv2.VideoWriter_fourcc(*"mp4v"),
-                        self.camera_params["framerate"],    
-                        resize_ratio,
+                        int(self.camera_params["framerate"]),    
+                        resize_ratio, False
                         
                     )  #int(fps.get_fps()) False for gray
                     self.textbox.insert(END, "Begin Record\n")
