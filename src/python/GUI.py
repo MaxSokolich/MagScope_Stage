@@ -46,8 +46,8 @@ PID_PARAMS = {
 }
 
 CONTROL_PARAMS = {
-    "lower_thresh": 0,#np.array([0,0,0]),  #HSV
-    "upper_thresh": 100,#np.array([180,255,140]),  #HSV   #130/150
+    "lower_thresh": np.array([0,0,0]),  #HSV
+    "upper_thresh": np.array([180,255,140]),  #HSV   #130/150
     "blur_thresh": 100,
     "initial_crop": 100,       #intial size of "screenshot" cropped frame 
     "tracking_frame": 1,            #cropped frame dimensions mulitplier
@@ -1306,9 +1306,6 @@ class GUI:
         try:
             actions = j_queue.get(0)
 
-           
-                
-            
             self.arduino.send(actions[0], actions[1], actions[2], actions[6], actions[7], actions[8])
                 
                     

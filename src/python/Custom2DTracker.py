@@ -639,7 +639,7 @@ class Tracker:
                         output_name + ".mp4",
                         cv2.VideoWriter_fourcc(*"mp4v"),
                         int(self.camera_params["framerate"]),    
-                        resize_ratio, False
+                        resize_ratio, 
                         
                     )  #int(fps.get_fps()) False for gray
                     self.textbox.insert(END, "Begin Record\n")
