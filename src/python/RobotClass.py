@@ -33,7 +33,7 @@ class Robot:
         self.tracks = []  # adds frame info on bot's error from manual track
         self.trajectory = []  # track points from manual pathing
         self.times = []  #time step per frame in seconds
- 
+        self.acoustic_freq = []#acoustic frequency applied
 
 
     def add_area(self, area: float):
@@ -134,6 +134,20 @@ class Robot:
             None
         """
         self.trajectory.append(traj)
+
+    def add_acoustic_freq(self, freq: float):
+        """
+        Add current acoustic freq being applied
+
+        Args:
+            freq:   acoustic frequency
+
+        Returns:
+            None
+        """
+        self.acoustic_freq.append(freq)
+
+  
 
     def add_track(
         self,

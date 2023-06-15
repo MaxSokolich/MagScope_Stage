@@ -195,7 +195,7 @@ class PID_Algorithm:
                 "Orient",
             )
            
-            arduino.send(typ,input1,input2,input3)
+            arduino.send(input1,input2,input3,0,0,0)
 
             
 

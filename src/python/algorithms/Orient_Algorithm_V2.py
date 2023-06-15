@@ -59,7 +59,6 @@ class Orient_Algorithm:
         if len(self.robot_list[-1].trajectory) > 1:
             #logic for arrival condition
             if self.node == len(self.robot_list[-1].trajectory):
-                typ = 4
                 input1 = 0
                 input2 = 0
                 input3 = 0
@@ -141,7 +140,7 @@ class Orient_Algorithm:
                 Bz = 0
                 self.alpha = np.arctan2(By, Bx)
                 
-                typ = 2
+        
                 input1 = round(Bx,2)
                 input2 = round(By,2)
                 input3 = round(Bz,2)

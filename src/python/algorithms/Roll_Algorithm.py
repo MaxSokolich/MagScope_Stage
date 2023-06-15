@@ -42,7 +42,6 @@ class Roll_Algorithm:
         if len(self.robot_list[-1].trajectory) > 1:
             #logic for arrival condition
             if self.node == len(self.robot_list[-1].trajectory):
-                typ = 4
                 input1 = 0
                 input2 = 0
                 input3 = 0
@@ -80,7 +79,6 @@ class Roll_Algorithm:
                 
                 #OUTPUT SIGNAL
                 my_alpha = self.alpha + np.pi/2
-                typ = 1
                 input1 = round(my_alpha,2)
                 input2 = self.control_params["rolling_frequency"]
                 input3 = self.control_params["gamma"]
@@ -97,7 +95,6 @@ class Roll_Algorithm:
                 "rolling")
 
             
-            #arduino.send(typ,input1,input2,input3)
             arduino.send(0,0,0, input1, input3, input2)
 
             
