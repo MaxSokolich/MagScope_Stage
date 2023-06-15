@@ -61,6 +61,7 @@ Code Specific:
     - python3.8 -m pip install -r JetsonOrinReqs.txt
 
 7) need to add "self.cam.PixelFormat.SetValue(PySpin.PixelFormat_BGR8)" above self.cam.BeginAcquistion() line in $ .local/lib/python3.8/site-packages/EasyPySpin.videocapture.py
+#or for windows machine: [label](../../AppData/Local/Programs/Python/Python38/Lib/site-packages/EasyPySpin)
 
 8) need to change in lib/python3.8/site-packages/adafruit_blinka/microcontroller/tegra/t234/pin.py from "GPIO.setmode(GPIO.TEGRA_SOC)" to GPIO.setmode(GPIO.BOARD)
     - otherwise the acoustic class and hall effect class will clash
