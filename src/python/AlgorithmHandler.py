@@ -9,6 +9,7 @@ from src.python.algorithms.Orient_Algorithm_V2 import Orient_Algorithm
 
 from src.python.algorithms.PID_code_forMax import PID_Algorithm
 from src.python.algorithms.MultiAgent_Algorithm import Multi_Agent_Algorithm
+from src.python.algorithms.Orient_Bubble import PI_Algorithm
 
 
 class AlgorithmHandler:
@@ -57,6 +58,7 @@ class AlgorithmHandler:
         self.Orient_Robot = Orient_Algorithm()
         self.Multi_Agent_Robot = Multi_Agent_Algorithm()
         self.PID_Robot = PID_Algorithm()
+        self.PI_Robot = PI_Algorithm()
         
 
     def run(self, 
@@ -79,6 +81,9 @@ class AlgorithmHandler:
         
         elif status_params["multi_agent_status"] == 1:
             self.Multi_Agent_Robot.control_trajectory(frame, arduino, robot_list, control_params)
+            
+        elif status_params["PI_status"] == 1:
+            self.PI_Robot.control_trajectory(frame, arduino, robot_list, control_params)
 
         else: 
             arduino.send(4, 0, 0, 0)
