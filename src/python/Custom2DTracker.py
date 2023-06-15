@@ -6,7 +6,7 @@ Module containing the Tracker class
 @authors: Max Sokolich, Brennan Gallamoza, Luke Halko, Trea Holley,
           Alexis Mainiero, Cameron Thacker, Zoe Valladares
 """
-
+from src.python.AnalysisClass import Analysis
 import time
 from typing import List, Tuple, Union
 import numpy as np
@@ -629,14 +629,14 @@ class Tracker:
             
             # add videos a seperate list to save space and write the video afterwords
             if self.status_params["record_status"]:
-                output_name = "src/videos/"+ output_name + str(int(time.time()-start))
+                vid_output_name = "src/videos/"+ output_name + str(int(time.time()-start))
                 if rec_start_time is None:
                     rec_start_time = time.time()
 
                 if result is None:
                     print(resize_ratio)
                     result = cv2.VideoWriter(
-                        output_name + ".mp4",
+                        vid_output_name + ".mp4",
                         cv2.VideoWriter_fourcc(*"mp4v"),
                         int(self.camera_params["framerate"]),    
                         resize_ratio, 
@@ -667,6 +667,10 @@ class Tracker:
                 result = None
                 self.textbox.insert(END, "End Record\n")
                 self.textbox.see("end")
+
+                analyze = Analysis(self.control_params, self.camera_params,self.status_params,self.robot_list)
+                analyze.convert2pickle(output_name)
+                analyze.plot()
 
         
             

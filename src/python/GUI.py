@@ -1210,10 +1210,10 @@ class GUI:
 
 
         
-        if self.get_widget(self.checkboxes_frame, "savepickle").var.get():
-            analyze = Analysis(CONTROL_PARAMS, CAMERA_PARAMS,STATUS_PARAMS,robot_list)
-            analyze.convert2pickle(output_name)
-            analyze.plot()
+        #if self.get_widget(self.checkboxes_frame, "savepickle").var.get():
+        #    analyze = Analysis(CONTROL_PARAMS, CAMERA_PARAMS,STATUS_PARAMS,robot_list)
+        #    analyze.convert2pickle(output_name)
+        #    analyze.plot()
 
         
 
