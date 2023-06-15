@@ -86,6 +86,6 @@ class AlgorithmHandler:
             self.PI_Robot.control_trajectory(frame, arduino, robot_list, control_params)
 
         else: 
-            arduino.send(4, 0, 0, 0)
+            arduino.send(0, 0, 0, 0, 0, 0)
     
         
