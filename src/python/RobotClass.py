@@ -219,6 +219,7 @@ class Robot:
             "Track_Params(frame,error,current_pos,target_pos,alpha,freq,time)": self.tracks,
             "TrajectoryX": traj_x,
             "TrajectoryY": traj_y,
+            "Acoustic Frequency": self.acoustic_freq,
         }
 
         return mydict

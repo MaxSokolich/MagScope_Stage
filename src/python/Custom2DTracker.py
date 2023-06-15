@@ -20,9 +20,9 @@ from src.python.Velocity import Velocity
 from src.python.ArduinoHandler import ArduinoHandler
 from src.python.FPSCounter import FPSCounter
 from src.python.AlgorithmHandler  import AlgorithmHandler 
-from src.python.Params import CONTROL_PARAMS, CAMERA_PARAMS, STATUS_PARAMS, ACOUSTIC_PARAMS, MAGNETIC_FIELD_PARAMS
+from src.python.Params import CONTROL_PARAMS, CAMERA_PARAMS, STATUS_PARAMS, ACOUSTIC_PARAMS, MAGNETIC_FIELD_PARAMS,PID_PARAMS
 
-#import EasyPySpin
+import EasyPySpin
 import warnings
 
 warnings.filterwarnings("error")
