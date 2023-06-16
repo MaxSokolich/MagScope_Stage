@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import style
 plt.style.use('dark_background')
-obj = pd.read_pickle("src/data/eeess.pickle")
+obj = pd.read_pickle("src/data/test.pickle")
 
 
 Vel_list = []
@@ -13,8 +13,9 @@ bots = []
 cm_subsection = np.linspace(0,len(obj),100)
 color = [plt.cm.jet(x) for x in cm_subsection]
 fig, ax = plt.subplots(3,1)
+print(len(obj[0]["Acoustic Frequency"]))
 
-
+print(len(obj[0]["VelX"]))
 
 for i,c in zip(range(len(obj)),color):
     robot = obj[i]
