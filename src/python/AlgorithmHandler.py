@@ -57,7 +57,7 @@ class AlgorithmHandler:
         self.Roll_Robot = Roll_Algorithm()
         self.Orient_Robot = Orient_Algorithm()
         self.Multi_Agent_Robot = Multi_Agent_Algorithm()
-        self.PID_Robot = PID_Algorithm()   # just let the self.PID_Robot = your algorithm you imported above
+        self.PID_Robot = PID_Algorithm()   
         self.yanda_Robot = PI_Algorithm()
         
 

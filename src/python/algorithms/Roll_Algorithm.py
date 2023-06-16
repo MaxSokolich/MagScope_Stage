@@ -92,7 +92,7 @@ class Roll_Algorithm:
                 self.alpha,
                 self.control_params["rolling_frequency"],
                 time.time()-self.start,
-                "rolling")
+                )
 
             
             arduino.send(0,0,0, input1, input3, input2)

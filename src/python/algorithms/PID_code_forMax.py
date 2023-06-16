@@ -192,7 +192,7 @@ class PID_Algorithm:
                 self.alpha,
                 self.control_params["rolling_frequency"],
                 time.time()-self.start,
-                "Orient",
+               
             )
            
             arduino.send(input1,input2,input3,0,0,0)

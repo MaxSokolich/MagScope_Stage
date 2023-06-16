@@ -45,8 +45,7 @@ ACOUSTIC_PARAMS = {
 }
 
 MAGNETIC_FIELD_PARAMS = {
-    "PositiveY": 0,
-    "PositiveX": 0,
-    "NegativeY": 0,
-    "NegativeX": 0,
+    "Bx": 0,
+    "By": 0,
+    "Bz": 0
 }

@@ -180,3 +180,4 @@ class Analysis:
             ax2.set_zlabel("Z (contrast units)")
     
             plt.show()
+

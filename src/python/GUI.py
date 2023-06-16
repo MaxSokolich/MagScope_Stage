@@ -33,7 +33,7 @@ from src.python.ArduinoHandler import ArduinoHandler
 from src.python.Brightness import Brightness
 from src.python.AnalysisClass import Analysis
 
-from src.python.PS4_Windows import MyController
+from src.python.PS4_Linux import MyController
 from src.python.Params import CONTROL_PARAMS, CAMERA_PARAMS, STATUS_PARAMS, ACOUSTIC_PARAMS, MAGNETIC_FIELD_PARAMS,PID_PARAMS
 # with jetson orin, cam can get up to 35 fps
 
@@ -1085,9 +1085,9 @@ class GUI:
         Kp_slider = Scale(
             master=window6,
             label="Kp",
-            from_=1,
-            to=100,
-            resolution=1,
+            from_=0.01,
+            to=10,
+            resolution=.01,
             variable=Kp,
             width=20,
             length=200,
@@ -1097,9 +1097,9 @@ class GUI:
         Ki_slider = Scale(
             master=window6,
             label="Ki",
-            from_=1,
-            to=100,
-            resolution=1,
+            from_=0.01,
+            to=10,
+            resolution=.01,
             variable=Ki,
             width=20,
             length=200,
@@ -1109,9 +1109,9 @@ class GUI:
         Kd_slider = Scale(
             master=window6,
             label="Kd",
-            from_=1,
-            to=100,
-            resolution=1,
+            from_=0.01,
+            to=10,
+            resolution=.01,
             variable=Kd,
             width=20,
             length=200,
@@ -1286,6 +1286,9 @@ class GUI:
         try:
             actions = j_queue.get(0)
             CONTROL_PARAMS["rolling_frequency"]
+            MAGNETIC_FIELD_PARAMS["Bx"] = actions[0]
+            MAGNETIC_FIELD_PARAMS["By"] = actions[1]
+            MAGNETIC_FIELD_PARAMS["Bz"] = actions[2]
             self.arduino.send(actions[0], actions[1], actions[2], actions[6], actions[7], actions[8])
 
                 
