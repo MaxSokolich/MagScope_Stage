@@ -22,7 +22,7 @@ from multiprocessing import Process, Queue
 
 
 
-PORT = "COM3"#"/dev/ttyACM0"
+PORT = "/dev/ttyACM0"
 
 
 if __name__ == "__main__":

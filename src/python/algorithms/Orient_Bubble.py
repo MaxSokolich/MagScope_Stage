@@ -59,10 +59,10 @@ class PI_Algorithm:
         self.Kp = self.pid_params["Kp"]
         self.Ki = self.pid_params["Ki"]
 
+
         if len(self.robot_list[-1].trajectory) > 1:
             #logic for arrival condition
             if self.node == len(self.robot_list[-1].trajectory):
-                typ = 4
                 input1 = 0
                 input2 = 0
                 input3 = 0
@@ -137,7 +137,7 @@ class PI_Algorithm:
                 Bz = 0
                 self.alpha = np.arctan2(By, Bx)
                 
-                typ = 2
+    
                 input1 = Bx
                 input2 = By
                 input3 = Bz
@@ -163,6 +163,6 @@ class PI_Algorithm:
                 "Orient",
             )
            
-            arduino.send(typ,input1,input2,input3)
+            arduino.send(input1,input2,input3,0,0,0)
 
 # In[ ]:

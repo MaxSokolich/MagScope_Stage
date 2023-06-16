@@ -57,8 +57,8 @@ class AlgorithmHandler:
         self.Roll_Robot = Roll_Algorithm()
         self.Orient_Robot = Orient_Algorithm()
         self.Multi_Agent_Robot = Multi_Agent_Algorithm()
-        self.PID_Robot = PI_Algorithm()#PID_Algorithm()   # just let the self.PID_Robot = your algorithm you imported above
-        #self.PI_Robot = PI_Algorithm()
+        self.PID_Robot = PID_Algorithm()   # just let the self.PID_Robot = your algorithm you imported above
+        self.yanda_Robot = PI_Algorithm()
         
 
     def run(self, 
@@ -82,8 +82,8 @@ class AlgorithmHandler:
         elif status_params["multi_agent_status"] == 1:
             self.Multi_Agent_Robot.control_trajectory(frame, arduino, robot_list, control_params)
             
-        #elif status_params["PI_status"] == 1:
-        #    self.PI_Robot.control_trajectory(frame, arduino, robot_list, control_params)
+        elif status_params["yanda_status"] == 1:
+            self.yanda_Robot.control_trajectory(frame, arduino, robot_list, control_params)
 
         else: 
             arduino.send(0, 0, 0, 0, 0, 0)

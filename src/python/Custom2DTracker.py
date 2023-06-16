@@ -320,7 +320,8 @@ class Tracker:
         bot.add_frame(self.frame_num)
         bot.add_time(round(time.time()-self.start,2))
         bot.add_acoustic_freq(ACOUSTIC_PARAMS["acoustic_freq"])
-        print(bot.acoustic_freq)
+   
+    
         
 
     def detect_robot(self, frame: np.ndarray, fps: FPSCounter, pix_2metric: float):

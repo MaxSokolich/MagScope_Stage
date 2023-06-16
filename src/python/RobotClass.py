@@ -157,7 +157,7 @@ class Robot:
         alpha: float,
         freq:float,
         time: float,
-        control_param: Union[str, None],
+        
     ):
         """
         Adds current frame's track information to the bot's tracks list
@@ -176,7 +176,7 @@ class Robot:
             None
         """
         self.tracks.append(
-            [error, actual_tracks, desired_tracks, alpha,freq, time, control_param]
+            [error, actual_tracks, desired_tracks, alpha,freq, time]
         )
 
     def add_time(self, time):

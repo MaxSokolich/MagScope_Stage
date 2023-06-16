@@ -34,6 +34,7 @@ STATUS_PARAMS = {
     "orient_status": 0,
     "multi_agent_status": 0,
     "PID_status": 0,
+    "yanda_status": 0,
     "algorithm_status": False,
     "record_status": False,
 }

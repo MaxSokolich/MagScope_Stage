@@ -19,6 +19,7 @@ import cv2
 import numpy as np
 import time
 from src.python.ArduinoHandler import ArduinoHandler
+from src.python.Params import CONTROL_PARAMS, CAMERA_PARAMS, STATUS_PARAMS, ACOUSTIC_PARAMS, MAGNETIC_FIELD_PARAMS,PID_PARAMS
 
 class Orient_Algorithm:
     def __init__(self):
@@ -63,6 +64,7 @@ class Orient_Algorithm:
                 input2 = 0
                 input3 = 0
                 print("arrived")
+    
 
 
             #closed loop algorithm 
@@ -163,7 +165,6 @@ class Orient_Algorithm:
                 self.alpha,
                 self.control_params["rolling_frequency"],
                 time.time()-self.start,
-                "Orient",
             )
             #arduino.send(typ,input1,input2,input3)
             arduino.send(input1,input2,input3, 0, 0, 0)

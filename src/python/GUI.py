@@ -256,11 +256,26 @@ class GUI:
         )
         AlgoPID_box.var = AlgoPID
 
+############################################################################
+#yandas checkbox
+        AlgoYanda = IntVar(master=master, name="yanda")
+        AlgoYanda_box = Checkbutton(
+            master=self.algorithm_frame, 
+            name = "yanda",
+            text="Yanda", 
+            command = self.coil_Yanda,
+            variable=AlgoYanda, 
+            onvalue=1, 
+            offvalue=0
+        )
+        AlgoYanda_box.var = AlgoYanda
+
 
         AlgoRoll_box.grid(row=1, column=0)
         AlgoOrient_box.grid(row=2, column=0)
         AlgoMulti_box.grid(row=3, column=0)
         AlgoPID_box.grid(row=4, column=0)
+        AlgoYanda_box.grid(row=5, column=0)
 
 
 
@@ -488,6 +503,17 @@ class GUI:
             None
         """
         STATUS_PARAMS["PID_status"] = self.get_widget(self.algorithm_frame, "pid").var.get()
+    
+    def coil_Yanda(self):
+        """
+        Flips the state of "Yanda_status" to True when "Yanda" is clicked
+
+        Args:
+            None
+        Returns:
+            None
+        """
+        STATUS_PARAMS["yanda_status"] = self.get_widget(self.algorithm_frame, "yanda").var.get()
 
 
     def run_algo(self):
@@ -886,11 +912,13 @@ class GUI:
         
         
         def apply_freq():
+            ACOUSTIC_PARAMS["acoustic_freq"] = int(acoustic_slider.get())
             self.AcousticModule.start(ACOUSTIC_PARAMS["acoustic_freq"],ACOUSTIC_PARAMS["acoustic_amplitude"])
             self.text_box.insert(END," -- waveform ON -- \n")
             self.text_box.see("end")
         
         def stop_freq():
+            ACOUSTIC_PARAMS["acoustic_freq"] = 0
             self.AcousticModule.stop()
             self.text_box.insert(END," -- waveform OFF -- \n")
             self.text_box.see("end")
@@ -1257,14 +1285,9 @@ class GUI:
         """
         try:
             actions = j_queue.get(0)
-
+            CONTROL_PARAMS["rolling_frequency"]
             self.arduino.send(actions[0], actions[1], actions[2], actions[6], actions[7], actions[8])
-                
-                    
-                    
-           
-            
-            
+
                 
         except Empty:
             pass
