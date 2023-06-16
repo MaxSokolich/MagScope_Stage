@@ -6,6 +6,8 @@ Module containing the Tracker class
 @authors: Max Sokolich, Brennan Gallamoza, Luke Halko, Trea Holley,
           Alexis Mainiero, Cameron Thacker, Zoe Valladares
 """
+import csv
+import pickle
 from src.python.AnalysisClass import Analysis
 import time
 from typing import List, Tuple, Union
@@ -419,6 +421,13 @@ class Tracker:
             (255, 255, 255),
             1,
         )
+        cv2.putText(frame,str(int(ACOUSTIC_PARAMS["acoustic_freq"])),
+            (int(w / 5),int(h / 40)),
+            cv2.FONT_HERSHEY_COMPLEX,
+            0.5,
+            (255, 255, 255),
+            1,
+        )
 
         # scale bar
         cv2.putText(frame,"100 um",
@@ -581,7 +590,7 @@ class Tracker:
         # Continously read and preprocess frames until end of video or error
         # is reached
 
-        
+        acoustic_dict = []
         while True:
             fps_counter.update()
             success, frame = cam.read()
@@ -663,6 +672,8 @@ class Tracker:
                     (255, 255, 255),
                     1
                 )
+                acoustic_dict.append([self.frame_num,ACOUSTIC_PARAMS["acoustic_freq"], MAGNETIC_FIELD_PARAMS["Bx"],
+                                  MAGNETIC_FIELD_PARAMS["By"],MAGNETIC_FIELD_PARAMS["Bz"]  ])
                 result.write(frame)
 
             elif result is not None and not self.status_params["record_status"]:
@@ -674,7 +685,7 @@ class Tracker:
 
                 analyze = Analysis(self.control_params, self.camera_params,self.status_params,self.robot_list)
                 analyze.convert2pickle(output_name)
-                analyze.plot()
+                #analyze.plot()
 
         
             
@@ -690,6 +701,7 @@ class Tracker:
                 
             
             # Exit
+         
             self.main_window.update()
             if k & 0xFF == ord("q"):
                 break
@@ -697,9 +709,20 @@ class Tracker:
 
         
         cam.release()
+        if result is not None:
+            result.release()
+        fields = ["frame", "freq", "Bx", "By", "Bz"]
+        filename = "src/data/"+output_name
+        with open(filename, "w") as f:
+            write = csv.writer(f)
+            write.writerow(fields)
+            write.writerows(acoustic_dict)
+        
+        print(" -- ({}.pickle) DONE -- ".format(filename))
+
         
         cv2.destroyAllWindows()
-        arduino.send(0,0,0, 0, 0, 0)
+        arduino.send(0, 0, 0, 0, 0, 0)
         for w in self.robot_checklist_list: w.destroy()
         self.robot_window.destroy()
         del self.robot_checklist_list[:]
