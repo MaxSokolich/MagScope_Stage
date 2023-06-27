@@ -723,7 +723,7 @@ class GUI:
         rolling_freq_slider = Scale(
             master=window3,
             label="Rolling Frequency",
-            from_=1,
+            from_=0,
             to=40,
             digits=4,
             resolution=1,
@@ -1285,11 +1285,22 @@ class GUI:
         """
         try:
             actions = j_queue.get(0)
-            CONTROL_PARAMS["rolling_frequency"]
+            #CONTROL_PARAMS["rolling_frequency"] = actions[8]
+            if actions[7] == 0:
+                gamma = 0
+            else:
+                gamma = CONTROL_PARAMS["gamma"]
+
+            if actions[8] != 0:
+                freq = CONTROL_PARAMS["rolling_frequency"]
+            else:
+                freq = 0
+            #freq = actions[8]
+            #gamma = actions[7]
             MAGNETIC_FIELD_PARAMS["Bx"] = actions[0]
             MAGNETIC_FIELD_PARAMS["By"] = actions[1]
             MAGNETIC_FIELD_PARAMS["Bz"] = actions[2]
-            self.arduino.send(actions[0], actions[1], actions[2], actions[6], actions[7], actions[8])
+            self.arduino.send(actions[0], actions[1], actions[2], actions[6], gamma, freq)
 
                 
         except Empty:

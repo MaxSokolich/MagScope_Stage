@@ -141,8 +141,9 @@ try:
         def exit(self):
             GPIO.output(self.dpINC, GPIO.HIGH)
             GPIO.output(self.dpCS, GPIO.HIGH)
-    
             GPIO.cleanup()
+
+            
 except Exception:
     class AcousticClass:
         def __init__(self):

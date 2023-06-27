@@ -3,7 +3,7 @@ import pygame
 import time
 import numpy as np
 from scipy import interpolate
-
+from src.python.Params import CONTROL_PARAMS
 
 class MyController:
     """
@@ -62,11 +62,12 @@ class MyController:
                      
                     if event.axis == 1: #LX
                         lx = self.deadzone(event.value)
-                        self.Bx = round(lx,3)
+                        self.Bx = -round(lx,3)
 
                     if event.axis == 4: #RY
                         rx = self.deadzone(event.value)
-                        ry = self.deadzone(joystick.get_axis(3))
+                        ry = -self.deadzone(joystick.get_axis(3))
+                
                         if rx == 0 and ry == 0:
                             self.alpha = 0
                             self.gamma = 0
@@ -107,9 +108,9 @@ class MyController:
                         self.acoustic_status = 1
                     if button == 3: #square
                         pass
-                    if button == 2: #triangle
-                        self.freq = 10
+                    if button == 2: #triangle #supposed to spin but is overwritten in GUI
                         self.gamma = 0
+                        self.freq = 10
                     if button == 5: #rb
                         self.Bz = 1
                     if button == 4: #lb
@@ -119,7 +120,7 @@ class MyController:
                     # Joystick button press event
                     button = event.button
                     if button == 1: #circle
-                        print("Controller Disconnected")
+                        print("Controller Disconnected....")
                         return True
                     if button == 0: #X
                         self.acoustic_status = 0

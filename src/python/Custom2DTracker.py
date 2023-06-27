@@ -634,7 +634,6 @@ class Tracker:
                                        self.status_params, 
                                        arduino, 
                                        frame)
-                #print(self.robot_list[-1].tracks)
 
               
             # UPDATE AND DISPLAY HUD ELEMENTS
