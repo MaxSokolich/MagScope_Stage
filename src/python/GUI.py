@@ -924,6 +924,7 @@ class GUI:
             self.text_box.see("end")
         
         def test_freq():
+            ACOUSTIC_PARAMS["acoustic_amplitude"] = int(amplitude_slider.get())
             self.AcousticModule.start(int(10000),ACOUSTIC_PARAMS["acoustic_amplitude"])
             self.text_box.insert(END," -- 10kHz Test -- \n")
             self.text_box.see("end")

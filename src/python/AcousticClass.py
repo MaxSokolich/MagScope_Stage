@@ -74,7 +74,7 @@ try:
             self.dp_set(flag)
             for i in range(step):
                 GPIO.output(self.dpINC, GPIO.LOW)
-                time.sleep(0.0001)
+                time.sleep(0.00001)
                 GPIO.output(self.dpINC, GPIO.HIGH)
                 time.sleep(0.000002)
     
@@ -180,16 +180,16 @@ we want a reading from 0 V to voltage maximum
 
 map(low_resistance, high resistance, high voltage, low voltage)
 """
-
-"""if __name__ == "__main__":
+"""
+if __name__ == "__main__":
 
     AcousticMod = AcousticClass()
     AcousticMod.dp_activate()
     print("starting waveform...")
     freqinput = 1000000
-    amplitude =10
+    amplitude =0
     AcousticMod.start(freqinput,amplitude)
-    time.sleep(10)
+    time.sleep(4)
     AcousticMod.stop()
     print("stopped waveform")
     AcousticMod.close()
