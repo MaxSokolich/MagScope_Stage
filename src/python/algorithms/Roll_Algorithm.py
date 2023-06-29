@@ -81,7 +81,7 @@ class Roll_Algorithm:
                 my_alpha = self.alpha + np.pi/2
                 input1 = round(my_alpha,2)
                 input2 = self.control_params["rolling_frequency"]
-                input3 = self.control_params["gamma"]
+                input3 = self.control_params["gamma"] * np.pi/180
                 
         
             

@@ -1290,7 +1290,7 @@ class GUI:
             if actions[7] == 0:
                 gamma = 0
             else:
-                gamma = CONTROL_PARAMS["gamma"]
+                gamma = CONTROL_PARAMS["gamma"]  * np.pi/180
 
             if actions[8] != 0:
                 freq = CONTROL_PARAMS["rolling_frequency"]

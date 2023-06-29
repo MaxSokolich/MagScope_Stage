@@ -24,7 +24,7 @@ from src.python.FPSCounter import FPSCounter
 from src.python.AlgorithmHandler  import AlgorithmHandler 
 from src.python.Params import CONTROL_PARAMS, CAMERA_PARAMS, STATUS_PARAMS, ACOUSTIC_PARAMS, MAGNETIC_FIELD_PARAMS,PID_PARAMS
 
-import EasyPySpin
+#import EasyPySpin
 import warnings
 
 warnings.filterwarnings("error")
@@ -144,6 +144,8 @@ class Tracker:
 
             #create robot checkbox in gui
             self.create_robot_checkbox(self.robot_window)
+
+            
 
         # Right mouse click event; allows you to draw the trajectory of the
         # most currently added microbot, so long as the button is held
@@ -461,7 +463,7 @@ class Tracker:
         #frame = cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
 
         if len(self.robot_list) > 0:
-            color = plt.cm.rainbow(np.linspace(0, 1, self.num_bots)) * 255
+            color = plt.cm.rainbow(np.linspace(1, 0, self.num_bots)) * 255
             self.get_fps
             # bot_ids = [i for i in range(self.num_bots)]
             for (
