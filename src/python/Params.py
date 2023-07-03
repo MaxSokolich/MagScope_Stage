@@ -16,7 +16,7 @@ CONTROL_PARAMS = {
     "tracking_frame": 1,            #cropped frame dimensions mulitplier
     "avg_bot_size": 5,
     "field_strength": 1,
-    "rolling_frequency": 0,
+    "rolling_frequency": 1,
     "arrival_thresh": 10,
     "gamma": 90,
     "memory": 15,
@@ -47,5 +47,7 @@ ACOUSTIC_PARAMS = {
 MAGNETIC_FIELD_PARAMS = {
     "Bx": 0,
     "By": 0,
-    "Bz": 0
+    "Bz": 0,
+    "alpha": 0,
+    "gamma": 0,
 }

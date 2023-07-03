@@ -15,6 +15,7 @@ or
 pix - 2448 x 2048 color
 maxframerate = 35 (actually 24)
 """
+import matplotlib.pyplot as plt
 import threading
 import colorsys
 from queue import Empty
@@ -32,8 +33,7 @@ from src.python.Custom2DTracker import Tracker
 from src.python.ArduinoHandler import ArduinoHandler
 from src.python.Brightness import Brightness
 from src.python.AnalysisClass import Analysis
-
-from src.python.PS4_Linux import MyController
+from src.python.PS4_Mac import MyController
 from src.python.Params import CONTROL_PARAMS, CAMERA_PARAMS, STATUS_PARAMS, ACOUSTIC_PARAMS, MAGNETIC_FIELD_PARAMS,PID_PARAMS
 # with jetson orin, cam can get up to 35 fps
 
@@ -1231,6 +1231,8 @@ class GUI:
         
         if self.joystick is not None:
             self.main_window.after_cancel(self.checkjoy)
+            
+        plt.close()
        
             
 
@@ -1264,8 +1266,7 @@ class GUI:
         Returns:
             None
         """
-    
-    
+
         self.joystick = MyController()
         self.joystick_process = multiprocessing.Process(target = self.joystick.run, args = (None,self.joystick_q))
         self.joystick_process.start()
@@ -1301,14 +1302,15 @@ class GUI:
             MAGNETIC_FIELD_PARAMS["Bx"] = actions[0]
             MAGNETIC_FIELD_PARAMS["By"] = actions[1]
             MAGNETIC_FIELD_PARAMS["Bz"] = actions[2]
+            MAGNETIC_FIELD_PARAMS["alpha"] = actions[6]
+            
             self.arduino.send(actions[0], actions[1], actions[2], actions[6], gamma, freq)
 
                 
         except Empty:
             pass
         finally:
-            
-            self.main_window.after(10,self.CheckJoystickPoll, j_queue)
+            self.checkjoy = self.main_window.after(10,self.CheckJoystickPoll, j_queue)
             
 
     def sensor_proc(self):
@@ -1320,6 +1322,7 @@ class GUI:
         Returns:
             None
         """
+        
         self.sensor = HallEffect()
         self.sensor.start(self.sense_q)
         self.checksensor = self.main_window.after(10, self.CheckSensorPoll, self.sense_q)
@@ -1333,6 +1336,7 @@ class GUI:
         Returns:
             None
         """
+    
         try:
             value_array = s_queue.get(0) # [s1,s2,s3,s4]
             
@@ -1354,7 +1358,9 @@ class GUI:
         except Empty:
             pass
         finally:
-            self.main_window.after(10,self.CheckSensorPoll, s_queue)
+            self.checksensor = self.main_window.after(10,self.CheckSensorPoll, s_queue)
+
+        
     
    
     def exit(self):
