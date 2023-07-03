@@ -314,13 +314,13 @@ void loop()
        Bz_roll = 0;
       }
    else {
-       Bx_roll = ( -sin(gamma)*cos(alpha)*cos(omega*t) + sin(alpha)*sin(omega*t));
-       By_roll = ( -cos(gamma)*sin(alpha)*cos(omega*t) + cos(alpha)*sin(omega*t)); 
-       Bz_roll = ( sin(gamma)*cos(omega*t));
+       //Bx_roll = ( -sin(gamma)*cos(alpha)*cos(omega*t) + sin(alpha)*sin(omega*t));
+       //By_roll = ( -cos(gamma)*sin(alpha)*cos(omega*t) + cos(alpha)*sin(omega*t)); 
+       //Bz_roll = ( sin(gamma)*cos(omega*t));
 
-       Bx_roll = (-sin(alpha) * sin(omega*t)) + (-cos(alpha) * cos(gamma)  * cos(omega*t)) 
-       By_roll =  (cos(alpha) * sin(omega*t)) + (-sin(alpha) * cos(gamma) *  cos(omega*t)) 
-       Bz_roll = sin(gamma) * cos(omega*t)
+       Bx_roll = (-sin(alpha) * sin(omega*t)) + (-cos(alpha) * cos(gamma)  * cos(omega*t)); 
+       By_roll =  (cos(alpha) * sin(omega*t)) + (-sin(alpha) * cos(gamma) *  cos(omega*t)); 
+       Bz_roll = sin(gamma) * cos(omega*t);
       }
    
 
