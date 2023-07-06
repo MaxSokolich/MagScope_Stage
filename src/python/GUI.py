@@ -33,7 +33,7 @@ from src.python.Custom2DTracker import Tracker
 from src.python.ArduinoHandler import ArduinoHandler
 from src.python.Brightness import Brightness
 from src.python.AnalysisClass import Analysis
-from src.python.PS4_Mac import MyController
+from src.python.PS4_Linux import MyController
 from src.python.Params import CONTROL_PARAMS, CAMERA_PARAMS, STATUS_PARAMS, ACOUSTIC_PARAMS, MAGNETIC_FIELD_PARAMS,PID_PARAMS
 # with jetson orin, cam can get up to 35 fps
 
@@ -257,25 +257,25 @@ class GUI:
         AlgoPID_box.var = AlgoPID
 
 ############################################################################
-#yandas checkbox
-        AlgoYanda = IntVar(master=master, name="yanda")
-        AlgoYanda_box = Checkbutton(
+#acoustic checkbox
+        AlgoAcoustic = IntVar(master=master, name="acoustic")
+        AlgoAcoustic_box = Checkbutton(
             master=self.algorithm_frame, 
-            name = "yanda",
-            text="Yanda", 
-            command = self.coil_Yanda,
-            variable=AlgoYanda, 
+            name = "acoustic",
+            text="Acoustic", 
+            command = self.coil_acoustic,
+            variable=AlgoAcoustic, 
             onvalue=1, 
             offvalue=0
         )
-        AlgoYanda_box.var = AlgoYanda
+        AlgoAcoustic_box.var = AlgoAcoustic
 
 
         AlgoRoll_box.grid(row=1, column=0)
         AlgoOrient_box.grid(row=2, column=0)
         AlgoMulti_box.grid(row=3, column=0)
         AlgoPID_box.grid(row=4, column=0)
-        AlgoYanda_box.grid(row=5, column=0)
+        AlgoAcoustic_box.grid(row=5, column=0)
 
 
 
@@ -504,16 +504,16 @@ class GUI:
         """
         STATUS_PARAMS["PID_status"] = self.get_widget(self.algorithm_frame, "pid").var.get()
     
-    def coil_Yanda(self):
+    def coil_acoustic(self):
         """
-        Flips the state of "Yanda_status" to True when "Yanda" is clicked
+        Flips the state of "acoustic_status" to True when "acoustic" is clicked
 
         Args:
             None
         Returns:
             None
         """
-        STATUS_PARAMS["yanda_status"] = self.get_widget(self.algorithm_frame, "yanda").var.get()
+        STATUS_PARAMS["acoustic_status"] = self.get_widget(self.algorithm_frame, "acoustic").var.get()
 
 
     def run_algo(self):
@@ -550,7 +550,7 @@ class GUI:
         window3 = Toplevel(self.main_window)
         window3.title("ControlParams")
 
-        #cretae a frame to keep track of upper and low HSV bounds
+        """#cretae a frame to keep track of upper and low HSV bounds
         detection_thresh = Frame(master = window3)
         detection_thresh.pack()
 
@@ -616,7 +616,7 @@ class GUI:
             bg = 'black',
             fg= 'white')
         
-        apply_thresh_but.grid(row=4,column=0,columnspan = 3)
+        apply_thresh_but.grid(row=4,column=0,columnspan = 3)"""
 
         
         
@@ -633,13 +633,13 @@ class GUI:
                 None
             """
 
-            #CONTROL_PARAMS["lower_thresh"] = int(lower_thresh_slider.get())
-            #CONTROL_PARAMS["upper_thresh"] = int(upper_thresh_slider.get())
+            CONTROL_PARAMS["lower_thresh"] = int(lower_thresh_slider.get())
+            CONTROL_PARAMS["upper_thresh"] = int(upper_thresh_slider.get())
             CONTROL_PARAMS["blur_thresh"] = int(blur_thresh_slider.get())
             CONTROL_PARAMS["initial_crop"] = int(initial_crop_slider.get())
             CONTROL_PARAMS["tracking_frame"] = int(tracking_frame_slider.get())
             CONTROL_PARAMS["avg_bot_size"] = int(avg_bot_size_slider.get())
-            CONTROL_PARAMS["field_strength"] = float(field_strength_slider.get())
+            ACOUSTIC_PARAMS["min_vel"] = float(minvel_slider.get())
             CONTROL_PARAMS["rolling_frequency"] = int(rolling_freq_slider.get())
             CONTROL_PARAMS["arrival_thresh"] = int(arrival_thresh_slider.get())
             CONTROL_PARAMS["gamma"] = int(gamma_slider.get())
@@ -647,17 +647,42 @@ class GUI:
 
             self.main_window.update()
 
-        #lower_thresh = DoubleVar()
-        #upper_thresh = DoubleVar()
+        lower_thresh = DoubleVar()
+        upper_thresh = DoubleVar()
         blur_thresh = DoubleVar()
         initial_crop = DoubleVar()
         avg_bot_size = DoubleVar()
         tracking_frame = DoubleVar()
-        field_strength = DoubleVar()
+        minvel = DoubleVar()
         rolling_frequency = DoubleVar()
         arrival_thresh = DoubleVar()
         gamma = DoubleVar()
         memory = DoubleVar()
+
+        lower_thresh_slider = Scale(
+            master=window3,
+            label="lower",
+            from_=0,
+            to=255,
+            resolution=1,
+            variable=lower_thresh,
+            width=20,
+            length=200,
+            orient=HORIZONTAL,
+            command=update_loop_slider_values,
+        )
+        upper_thresh_slider = Scale(
+            master=window3,
+            label="upper",
+            from_=0,
+            to=255,
+            resolution=1,
+            variable=upper_thresh,
+            width=20,
+            length=200,
+            orient=HORIZONTAL,
+            command=update_loop_slider_values,
+        )
 
         blur_thresh_slider = Scale(
             master=window3,
@@ -707,14 +732,14 @@ class GUI:
             orient=HORIZONTAL,
             command=update_loop_slider_values,
         )
-        field_strength_slider = Scale(
+        minvel_slider = Scale(
             master=window3,
-            label="Field Strength",
-            from_=0,
-            to=1,
+            label="min vel (um/s)",
+            from_=1,
+            to=20,
             digits=4,
             resolution=0.1,
-            variable=field_strength,
+            variable=minvel,
             width=20,
             length=200,
             orient=HORIZONTAL,
@@ -771,25 +796,25 @@ class GUI:
             command=update_loop_slider_values,
         )
 
-        #lower_thresh_slider.set(CONTROL_PARAMS["lower_thresh"])
-        #upper_thresh_slider.set(CONTROL_PARAMS["upper_thresh"])
+        lower_thresh_slider.set(CONTROL_PARAMS["lower_thresh"])
+        upper_thresh_slider.set(CONTROL_PARAMS["upper_thresh"])
         blur_thresh_slider.set(CONTROL_PARAMS["blur_thresh"])
         initial_crop_slider.set(CONTROL_PARAMS["initial_crop"])
         tracking_frame_slider.set(CONTROL_PARAMS["tracking_frame"])
         avg_bot_size_slider.set(CONTROL_PARAMS["avg_bot_size"])
-        field_strength_slider.set(CONTROL_PARAMS["field_strength"])
+        minvel_slider.set(ACOUSTIC_PARAMS["min_vel"])
         rolling_freq_slider.set(CONTROL_PARAMS["rolling_frequency"])
         arrival_thresh_slider.set(CONTROL_PARAMS["arrival_thresh"])
         gamma_slider.set(CONTROL_PARAMS["gamma"])
         memory_slider.set(CONTROL_PARAMS["memory"])
 
-        #lower_thresh_slider.pack()
-        #upper_thresh_slider.pack()
+        lower_thresh_slider.pack()
+        upper_thresh_slider.pack()
         blur_thresh_slider.pack()
         initial_crop_slider.pack()
         tracking_frame_slider.pack()
         avg_bot_size_slider.pack()
-        field_strength_slider.pack()
+        minvel_slider.pack()
         rolling_freq_slider.pack()
         arrival_thresh_slider.pack()
         gamma_slider.pack()
@@ -872,9 +897,9 @@ class GUI:
         obj_slider = Scale(
             master=window4,
             label="Obj x",
-            from_=10,
-            to=100,
-            resolution=10,
+            from_=5,
+            to=50,
+            resolution=5,
             variable=obj,
             width=20,
             length=200,
@@ -1187,14 +1212,14 @@ class GUI:
         output_name = str(self.get_widget(self.video_record_frame, "output_name").get())
         
 
-        robot_list = tracker.main(video_name, self.arduino, output_name)
+        robot_list = tracker.main(video_name, self.arduino, self.AcousticModule, output_name)
 
 
         
-        #if self.get_widget(self.checkboxes_frame, "savepickle").var.get():
-        #    analyze = Analysis(CONTROL_PARAMS, CAMERA_PARAMS,STATUS_PARAMS,robot_list)
-        #    analyze.convert2pickle(output_name)
-        #    analyze.plot()
+        if self.get_widget(self.checkboxes_frame, "savepickle").var.get():
+            analyze = Analysis(CONTROL_PARAMS, CAMERA_PARAMS,STATUS_PARAMS,robot_list)
+            analyze.convert2pickle(output_name)
+            analyze.plot()
 
         
 
@@ -1219,6 +1244,8 @@ class GUI:
 
         #self.tracker.robot_window.destroy()
         self.arduino.send(0,0,0, 0, 0, 0)
+        self.AcousticModule.stop()
+        ACOUSTIC_PARAMS["acoustic_freq"] = 0
 
         #ensure motors are off
         
@@ -1287,6 +1314,7 @@ class GUI:
         """
         try:
             actions = j_queue.get(0)
+            alpha = actions[6] - np.pi/2 #subtract 90 for rolling
             #CONTROL_PARAMS["rolling_frequency"] = actions[8]
             if actions[7] == 0:
                 gamma = 0
@@ -1302,9 +1330,10 @@ class GUI:
             MAGNETIC_FIELD_PARAMS["Bx"] = actions[0]
             MAGNETIC_FIELD_PARAMS["By"] = actions[1]
             MAGNETIC_FIELD_PARAMS["Bz"] = actions[2]
-            MAGNETIC_FIELD_PARAMS["alpha"] = actions[6]
+            MAGNETIC_FIELD_PARAMS["alpha"] = alpha
+            MAGNETIC_FIELD_PARAMS["gamma"] = gamma
             
-            self.arduino.send(actions[0], actions[1], actions[2], actions[6], gamma, freq)
+            self.arduino.send(actions[0], actions[1], actions[2], alpha, gamma, freq)
 
                 
         except Empty:

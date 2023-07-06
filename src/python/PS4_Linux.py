@@ -56,17 +56,18 @@ class MyController:
                 if event.type == pygame.JOYAXISMOTION:
                 
                     # Joystick movement event
-                    if event.axis == 0:  #LY
+                    if event.axis == 1:  #LY
                         ly = self.deadzone(event.value)
-                        self.By = round(ly,3)
+                        self.By = -round(ly,3)
                      
-                    if event.axis == 1: #LX
+                    if event.axis == 0: #LX
                         lx = self.deadzone(event.value)
-                        self.Bx = -round(lx,3)
+                        self.Bx = round(lx,3)
 
                     if event.axis == 4: #RY
-                        rx = self.deadzone(event.value)
-                        ry = -self.deadzone(joystick.get_axis(3))
+                        ry = -self.deadzone(event.value)
+                        rx = self.deadzone(joystick.get_axis(3))
+        
                 
                         if rx == 0 and ry == 0:
                             self.alpha = 0
@@ -74,16 +75,16 @@ class MyController:
                             self.freq = 0
 
                         elif rx == 0 and ry > 0:
-                            self.alpha = 0
+                            self.alpha = np.pi/2
                             self.gamma = np.pi/2
                             self.freq = int(np.sqrt((rx)**2 + (ry)**2)*20)
                             
                         elif rx == 0 and ry < 0:
-                            self.alpha = -np.pi
+                            self.alpha = -np.pi/2
                             self.gamma = np.pi/2
                             self.freq = int(np.sqrt((rx)**2 + (ry)**2)*20)
                         else:
-                            angle = np.arctan2(ry,rx) - np.pi/2 
+                            angle = np.arctan2(ry,rx) 
                             self.alpha = round(angle,3)
                             self.gamma = np.pi/2
                             self.freq = int(np.sqrt((rx)**2 + (ry)**2)*20)
@@ -109,8 +110,7 @@ class MyController:
                     if button == 3: #square
                         pass
                     if button == 2: #triangle #supposed to spin but is overwritten in GUI
-                        self.gamma = 0
-                        self.freq = 10
+                        pass
                     if button == 5: #rb
                         self.Bz = 1
                     if button == 4: #lb
@@ -127,8 +127,9 @@ class MyController:
                     if button == 3: #square
                         pass
                     if button == 2: #triangle
-                        self.freq = 0
-                        self.gamma = 0
+                        #self.freq = 0
+                        #self.gamma = np.pi/2
+                        pass
                     if button == 5: #rb
                         self.Bz = 0
                     if button == 4: #lb
@@ -139,6 +140,7 @@ class MyController:
                 elif event.type == pygame.JOYHATMOTION:
                     #JOYSTICK HAT press event
                     self.Mx, self.My = event.value
+
                  
             
             self.actions = [self.Bx, 

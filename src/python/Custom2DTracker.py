@@ -22,9 +22,11 @@ from src.python.Velocity import Velocity
 from src.python.ArduinoHandler import ArduinoHandler
 from src.python.FPSCounter import FPSCounter
 from src.python.AlgorithmHandler  import AlgorithmHandler 
+from src.python.Projection import AxisProjection
+from src.python.AcousticClass import AcousticClass
 from src.python.Params import CONTROL_PARAMS, CAMERA_PARAMS, STATUS_PARAMS, ACOUSTIC_PARAMS, MAGNETIC_FIELD_PARAMS,PID_PARAMS
 
-#import EasyPySpin
+import EasyPySpin
 import warnings
 
 warnings.filterwarnings("error")
@@ -75,6 +77,8 @@ class Tracker:
 
         self.cp = ContourProcessor(self.control_params,use_cuda)
         self.Algorithm = AlgorithmHandler()
+
+        self.projection = AxisProjection()
 
         self.main_window = main_window
         self.textbox = textbox
@@ -171,6 +175,7 @@ class Tracker:
         elif event == cv2.EVENT_MBUTTONDOWN:
             #reset algorothms i.e. set node back to 0
             self.Algorithm = AlgorithmHandler()
+            #ACOUSTIC_PARAMS["acoustic_freq"] = 0
             #other
             self.num_bots = 0
             self.robot_window.destroy()
@@ -423,6 +428,7 @@ class Tracker:
             (255, 255, 255),
             1,
         )
+        #acoustic freq
         cv2.putText(frame,str(int(ACOUSTIC_PARAMS["acoustic_freq"])),
             (int(w / 5),int(h / 40)),
             cv2.FONT_HERSHEY_COMPLEX,
@@ -459,6 +465,10 @@ class Tracker:
         Returns:
             None
         """
+        w = frame.shape[0]
+        h = frame.shape[1]
+        self.projection.draw_sideview(frame, MAGNETIC_FIELD_PARAMS["alpha"], MAGNETIC_FIELD_PARAMS["gamma"],w,h )
+        self.projection.draw_topview(frame, MAGNETIC_FIELD_PARAMS["alpha"], MAGNETIC_FIELD_PARAMS["gamma"],w,h )
         self.get_fps(fps, frame)
         #frame = cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
 
@@ -538,7 +548,9 @@ class Tracker:
         self,
         filepath: Union[str, None],
         arduino: ArduinoHandler,
+        AcousticModule: AcousticClass,
         output_name: str = "",
+       
     ):
         """
         Connect to a camera or video file and perform real time tracking and analysis of microbots
@@ -635,6 +647,7 @@ class Tracker:
                                        self.camera_params,
                                        self.status_params, 
                                        arduino, 
+                                       AcousticModule,
                                        frame)
 
               

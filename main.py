@@ -39,7 +39,7 @@ if __name__ == "__main__":
    
     #start gui mainwindow
     asyncio.run(gui.main())
-    #gui.main()
+    #gui.main()src.python.
  
 
  #white [0,0,200]-> [180,255,255]

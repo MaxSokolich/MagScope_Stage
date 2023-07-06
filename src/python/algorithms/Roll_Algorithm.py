@@ -8,7 +8,7 @@ import cv2
 import numpy as np
 import time
 from src.python.ArduinoHandler import ArduinoHandler
-
+from src.python.Params import MAGNETIC_FIELD_PARAMS
 class Roll_Algorithm:
     def __init__(self):
         #every time middle mouse button is pressed, it will reinitiate this classe
@@ -78,10 +78,12 @@ class Roll_Algorithm:
 
                 
                 #OUTPUT SIGNAL
-                my_alpha = self.alpha + np.pi/2
+                my_alpha = self.alpha - np.pi/2  #subtract 90 for roll
                 input1 = round(my_alpha,2)
                 input2 = self.control_params["rolling_frequency"]
                 input3 = self.control_params["gamma"] * np.pi/180
+                MAGNETIC_FIELD_PARAMS["alpha"] = input1
+                MAGNETIC_FIELD_PARAMS["gamma"] = input3
                 
         
             

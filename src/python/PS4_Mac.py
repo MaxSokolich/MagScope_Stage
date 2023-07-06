@@ -72,17 +72,14 @@ class MyController:
 
                         elif rx == 0 and ry > 0:
                             self.alpha = 0
-                            self.gamma = np.pi/2
                             self.freq = int(np.sqrt((rx)**2 + (ry)**2)*20)
                             
                         elif rx == 0 and ry < 0:
                             self.alpha = -np.pi
-                            self.gamma = np.pi/2
                             self.freq = int(np.sqrt((rx)**2 + (ry)**2)*20)
                         else:
                             angle = np.arctan2(ry,rx) - np.pi/2 
                             self.alpha = round(angle,3)
-                            self.gamma = np.pi/2
                             self.freq = int(np.sqrt((rx)**2 + (ry)**2)*20)
 
 
