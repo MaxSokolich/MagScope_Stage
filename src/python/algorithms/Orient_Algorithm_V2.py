@@ -146,6 +146,9 @@ class Orient_Algorithm:
                 input1 = round(Bx,2)
                 input2 = round(By,2)
                 input3 = round(Bz,2)
+                MAGNETIC_FIELD_PARAMS["Bx"] = input1
+                MAGNETIC_FIELD_PARAMS["By"] = input2
+                MAGNETIC_FIELD_PARAMS["Bz"] = input3
                 try:
                     start_arrow = (100, 150 + (self.num_bots - 1) * 20)
                     end_arrow = (

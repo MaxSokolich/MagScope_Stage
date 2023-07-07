@@ -4,20 +4,29 @@ import math
 
 class AxisProjection:
 
-    def projection(self, window, alpha, gamma, pitch, yaw, roll, w, h, offsetx, offsety,title):
+    def projection(self, window, Bx,By,Bz,alpha, gamma, pitch, yaw, roll, w, h, offsetx, offsety,title):
     
         def spherical_to_cartesian(rho, theta, phi):
             x = rho * np.sin(phi) * np.cos(theta)
             y = rho * np.sin(phi) * np.sin(theta)
             z = rho * np.cos(phi)
             return x, y, z
-        alpha = alpha + np.pi/2
+        
+
         linethickness = int(max(min(w,h)/(190),1))
         thickness = int(max(min(w,h)/(500),1))
         fontScale = min(w,h)/(1800)
         scaleline = min(w,h)/(1400)  # Adjust the scale here
         #print(i, scaleline)
-        x2, y2, z2 = spherical_to_cartesian(scaleline, alpha, gamma)
+        #print(Bx,By,Bz, alpha, gamma)
+        #projection from rotating field
+        if [Bx, By, Bz] != [0,0,0]:
+            x2,y2,z2 = Bx,By,Bz
+        #projection from constant field
+        else:
+            alpha = alpha + np.pi/2
+            x2, y2, z2 = spherical_to_cartesian(scaleline, alpha, gamma)
+            
         axis_points = np.float32([[0, 0, 0], [scaleline, 0, 0], [0, -scaleline, 0], [0, 0, scaleline], [x2, -y2, z2]])
 
         # rotate axis
@@ -56,19 +65,19 @@ class AxisProjection:
    
         return window
 
-    def draw_topview(self, window,alpha, gamma, window_width, window_height):
+    def draw_topview(self, window,Bx,By,Bz,alpha, gamma, window_width, window_height):
         title = "top"
         pitch,yaw,roll = 0,0,0
         offsetx, offsety = int((window_width/2)*(6.5/10)) , -int((window_height/2)*(7.4/10))#pixel offset from center 
-        window = self.projection(window,alpha,gamma,pitch,yaw,roll,window_width, window_height, offsetx,offsety, title)
+        window = self.projection(window,Bx,By,Bz,alpha,gamma,pitch,yaw,roll,window_width, window_height, offsetx,offsety, title)
         return window
     
-    def draw_sideview(self, window, alpha, gamma, window_width, window_height):
+    def draw_sideview(self, window, Bx,By,Bz,alpha, gamma, window_width, window_height):
         #side view 
         title = "side"
         pitch,yaw,roll = 90,0,0
         offsetx, offsety = int((window_width/2)*(9.5/10)) , -int((window_height/2)*(7.4/10))#pixel offset from center 
-        window = self.projection(window,alpha,gamma,pitch,yaw,roll,window_width, window_height, offsetx,offsety, title)
+        window = self.projection(window,Bx,By,Bz,alpha,gamma,pitch,yaw,roll,window_width, window_height, offsetx,offsety, title)
         return window
 """
 if __name__ == "__main__":

@@ -51,8 +51,8 @@ class AlgorithmHandler:
             self.Multi_Agent_Robot.control_trajectory(frame, arduino, robot_list, control_params)
             
         elif status_params["acoustic_status"] == 1:
-            actions = self.acoustic_Robot.run(frame, robot_list, AcousticModule)
-            print(actions)
+            self.acoustic_Robot.run(frame, arduino, robot_list, AcousticModule)
+
 
         else: 
             arduino.send(0, 0, 0, 0, 0, 0)

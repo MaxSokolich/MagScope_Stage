@@ -44,6 +44,7 @@ class Acoustic_Algorithm:
         self.T_R = 1
         self.theta_maps = np.array([])
         self.theta = 0
+        self.start = time.time()
 
 
         #values for finding optimal resonant frequency
@@ -55,7 +56,7 @@ class Acoustic_Algorithm:
         self.optimal_freq = None
         self.resistance = 0
 
-        self.velocity_max_thresh = 25 #um/s
+        self.velocity_max_thresh =  min(ACOUSTIC_PARAMS["min_vel"] *5, 50) #um/s
         
     def reset(self):
 
@@ -156,12 +157,12 @@ class Acoustic_Algorithm:
 
                 self.count += 1#increment counter
 
-            self.acoustic_params["acoustic_freq"] = self.current_freq  # save variables to global param variables
-            self.acoustic_params["acoustic_resistance"] = self.resistance
+            ACOUSTIC_PARAMS["acoustic_freq"] = self.current_freq  # save variables to global param variables
+            ACOUSTIC_PARAMS["acoustic_resistance"] = self.resistance
         
         
 
-    def run(self, frame, robot_list,AcousticModule):
+    def run(self, frame, arduino, robot_list,AcousticModule):
         """
         inputs: the robot list from tracking
         outputs: actions list in the form of [Bx,By,Bz,alpha,gamma,freq]
@@ -170,11 +171,11 @@ class Acoustic_Algorithm:
         
         if len(robot_list) > 0:  #if we clicked on a robot
 
-            #THIS IS WHERE WE WILL apply frequency. before a trajectory is drawin
-            self.find_optimal_freqv2(robot_list, AcousticModule)
-        
-
             if len(robot_list[-1].trajectory) > 1:  # if we drew a trajectory
+                
+                
+                self.find_optimal_freqv2(robot_list, AcousticModule)
+
                 #logic for arrival condition
                 if self.node == len(robot_list[-1].trajectory):
                     #zero B field signals
@@ -183,13 +184,11 @@ class Acoustic_Algorithm:
 
                     #stop acoustic module
                     AcousticModule.stop()
+                    ACOUSTIC_PARAMS["acoustic_freq"] = 0
                     print("arrived")
                 
                 #closed loop algorithm 
                 else:
-
-                
-
                     #define target coordinate
                     targetx = robot_list[-1].trajectory[self.node][0]
                     targety = robot_list[-1].trajectory[self.node][1]
@@ -254,6 +253,9 @@ class Acoustic_Algorithm:
                     self.Bx = round(Bx,2)
                     self.By = round(By,2)
                     self.Bz = round(Bz,2)
+                    MAGNETIC_FIELD_PARAMS["Bx"] = self.Bx
+                    MAGNETIC_FIELD_PARAMS["By"] = self.By
+                    MAGNETIC_FIELD_PARAMS["Bz"] = self.Bz
                     try:
                         start_arrow = (100, 150 + (self.num_bots - 1) * 20)
                         end_arrow = (
@@ -265,13 +267,25 @@ class Acoustic_Algorithm:
                         )
                     except:
                         pass
+                
+                    robot_list[-1].add_track(
+                        error,
+                        [robotx, roboty],
+                        [targetx, targety],
+                        self.alpha,
+                        ACOUSTIC_PARAMS["acoustic_freq"],
+                        time.time()-self.start,
+                        )
 
         else:
             self.Bx, self.By, self.Bz = 0,0,0
             self.alpha, self.gamma, self.freq = 0,0,0
             AcousticModule.stop()
+
+        
             
         actions = [self.Bx, self.By, self.Bz, self.alpha, self.resistance, self.min_freq, self.current_freq, self.max_freq, self.optimal_freq] #chaning the actions to better align with acoustic bots
-        return actions
+        print(actions)
+        #arduino.send(self.Bx, self.By, self.Bz, 0, 0, 0)
     
         

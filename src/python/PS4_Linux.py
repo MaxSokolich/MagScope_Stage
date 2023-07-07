@@ -48,7 +48,7 @@ class MyController:
        
         # Main loop
         while True:
-            clock.tick(1000) #ms
+            clock.tick(100) #ms
             # Check for joystick events
             for event in pygame.event.get():
                 

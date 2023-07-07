@@ -26,7 +26,10 @@ from src.python.Projection import AxisProjection
 from src.python.AcousticClass import AcousticClass
 from src.python.Params import CONTROL_PARAMS, CAMERA_PARAMS, STATUS_PARAMS, ACOUSTIC_PARAMS, MAGNETIC_FIELD_PARAMS,PID_PARAMS
 
-import EasyPySpin
+try:
+    import EasyPySpin
+except:
+    pass
 import warnings
 
 warnings.filterwarnings("error")
@@ -429,7 +432,8 @@ class Tracker:
             1,
         )
         #acoustic freq
-        cv2.putText(frame,str(int(ACOUSTIC_PARAMS["acoustic_freq"])),
+        freq = f'{ACOUSTIC_PARAMS["acoustic_freq"]:,} Hz'
+        cv2.putText(frame,freq,
             (int(w / 5),int(h / 40)),
             cv2.FONT_HERSHEY_COMPLEX,
             0.5,
@@ -467,8 +471,9 @@ class Tracker:
         """
         w = frame.shape[0]
         h = frame.shape[1]
-        self.projection.draw_sideview(frame, MAGNETIC_FIELD_PARAMS["alpha"], MAGNETIC_FIELD_PARAMS["gamma"],w,h )
-        self.projection.draw_topview(frame, MAGNETIC_FIELD_PARAMS["alpha"], MAGNETIC_FIELD_PARAMS["gamma"],w,h )
+        Bx,By,Bz = MAGNETIC_FIELD_PARAMS["Bx"],MAGNETIC_FIELD_PARAMS["By"],MAGNETIC_FIELD_PARAMS["Bz"]
+        self.projection.draw_sideview(frame, Bx,By,Bz,MAGNETIC_FIELD_PARAMS["alpha"], MAGNETIC_FIELD_PARAMS["gamma"],w,h )
+        self.projection.draw_topview(frame, Bx,By,Bz,MAGNETIC_FIELD_PARAMS["alpha"], MAGNETIC_FIELD_PARAMS["gamma"],w,h )
         self.get_fps(fps, frame)
         #frame = cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
 
@@ -549,7 +554,7 @@ class Tracker:
         filepath: Union[str, None],
         arduino: ArduinoHandler,
         AcousticModule: AcousticClass,
-        output_name: str = "",
+        
        
     ):
         """
@@ -573,9 +578,10 @@ class Tracker:
         if filepath is None:
             try:
                 cam = EasyPySpin.VideoCapture(0)
-            except EasyPySpin.EasyPySpinWarning:
+            except Exception:
                 self.textbox.insert(END,"EasyPySpin camera not found, using standard camera\n")
                 self.textbox.see("end")
+                cam = cv2.VideoCapture(0)
                
             # cam = cv2.VideoCapture(0)
         else:
@@ -650,20 +656,20 @@ class Tracker:
                                        AcousticModule,
                                        frame)
 
-              
+            
             # UPDATE AND DISPLAY HUD ELEMENTS
             self.display_hud(frame, fps_counter)
             
             # add videos a seperate list to save space and write the video afterwords
             if self.status_params["record_status"]:
-                vid_output_name = "src/videos/"+ output_name + str(int(time.time()-start))
+                output_name = "src/videos/" + self.camera_params["outputname"]
                 if rec_start_time is None:
                     rec_start_time = time.time()
 
                 if result is None:
                     print(resize_ratio)
                     result = cv2.VideoWriter(
-                        vid_output_name + ".mp4",
+                        output_name + ".mp4",
                         cv2.VideoWriter_fourcc(*"mp4v"),
                         int(self.camera_params["framerate"]),    
                         resize_ratio, 
@@ -695,8 +701,9 @@ class Tracker:
                 self.textbox.insert(END, "End Record\n")
                 self.textbox.see("end")
 
-                analyze = Analysis(self.control_params, self.camera_params,self.status_params,self.robot_list)
-                analyze.convert2pickle(output_name)
+                if len(self.robot_list) > 0:
+                    analyze = Analysis(self.control_params, self.camera_params,self.status_params,self.robot_list)
+                    analyze.convert2pickle(output_name)
                 #analyze.plot()
 
         

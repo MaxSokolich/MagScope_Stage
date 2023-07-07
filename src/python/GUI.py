@@ -33,7 +33,7 @@ from src.python.Custom2DTracker import Tracker
 from src.python.ArduinoHandler import ArduinoHandler
 from src.python.Brightness import Brightness
 from src.python.AnalysisClass import Analysis
-from src.python.PS4_Linux import MyController
+from src.python.PS4_Mac import MyController
 from src.python.Params import CONTROL_PARAMS, CAMERA_PARAMS, STATUS_PARAMS, ACOUSTIC_PARAMS, MAGNETIC_FIELD_PARAMS,PID_PARAMS
 # with jetson orin, cam can get up to 35 fps
 
@@ -1168,6 +1168,7 @@ class GUI:
         Returns:
             None
         """
+        CAMERA_PARAMS["outputname"] = str(self.get_widget(self.video_record_frame, "output_name").get())
         STATUS_PARAMS["record_status"] = True
 
     def stop_record(self):
@@ -1209,17 +1210,15 @@ class GUI:
         else:
             video_name = self.external_file
 
-        output_name = str(self.get_widget(self.video_record_frame, "output_name").get())
         
+        robot_list = tracker.main(video_name, self.arduino, self.AcousticModule)
 
-        robot_list = tracker.main(video_name, self.arduino, self.AcousticModule, output_name)
-
-
-        
         if self.get_widget(self.checkboxes_frame, "savepickle").var.get():
-            analyze = Analysis(CONTROL_PARAMS, CAMERA_PARAMS,STATUS_PARAMS,robot_list)
-            analyze.convert2pickle(output_name)
-            analyze.plot()
+            if len(robot_list) > 0:
+                output_name = str(self.get_widget(self.video_record_frame, "output_name").get())
+                analyze = Analysis(CONTROL_PARAMS, CAMERA_PARAMS,STATUS_PARAMS,robot_list)
+                analyze.convert2pickle(output_name)
+                #analyze.plot()
 
         
 
@@ -1316,10 +1315,8 @@ class GUI:
             actions = j_queue.get(0)
             alpha = actions[6] - np.pi/2 #subtract 90 for rolling
             #CONTROL_PARAMS["rolling_frequency"] = actions[8]
-            if actions[7] == 0:
-                gamma = 0
-            else:
-                gamma = CONTROL_PARAMS["gamma"]  * np.pi/180
+            
+            gamma = CONTROL_PARAMS["gamma"]  * np.pi/180
 
             if actions[8] != 0:
                 freq = CONTROL_PARAMS["rolling_frequency"]

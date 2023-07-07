@@ -1,4 +1,4 @@
-import numpy as np
+from datetime import datetime
 
 PID_PARAMS = {
     "Iframes": 100,
@@ -27,7 +27,8 @@ CAMERA_PARAMS = {
     "resize_scale": 50, 
     "framerate": 24, 
     "exposure": 6000,   #6000
-    "Obj": 10}
+    "Obj": 10,
+    "outputname": str(datetime.now())}
 
 STATUS_PARAMS = {
     "rolling_status": 0,

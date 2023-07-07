@@ -48,23 +48,26 @@ class MyController:
        
         # Main loop
         while True:
-            clock.tick(70) #ms
+            clock.tick(100) #ms
             # Check for joystick events
             for event in pygame.event.get():
                 #axis condition
                 if event.type == pygame.JOYAXISMOTION:
                     # Joystick movement event
-                    if event.axis == 0:  #LY
-                        ly = self.deadzone(event.value)
+                    if event.axis == 1:  #LY
+                        ly = -self.deadzone(event.value)
                         self.By = round(ly,3)
+                    
                      
-                    if event.axis == 1: #LX
+                    if event.axis == 0: #LX
                         lx = self.deadzone(event.value)
                         self.Bx = round(lx,3)
+              
 
                     if event.axis == 2: #RY
                         rx = self.deadzone(event.value)
-                        ry = self.deadzone(joystick.get_axis(3))
+                        ry = -self.deadzone(joystick.get_axis(3))
+                
                         if rx == 0 and ry == 0:
                             self.alpha = 0
                             self.gamma = 0
