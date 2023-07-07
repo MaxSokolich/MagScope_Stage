@@ -67,8 +67,7 @@ class MyController:
                     if event.axis == 4: #RY
                         ry = -self.deadzone(event.value)
                         rx = self.deadzone(joystick.get_axis(3))
-        
-                
+                       
                         if rx == 0 and ry == 0:
                             self.alpha = 0
                             self.gamma = 0
@@ -76,30 +75,30 @@ class MyController:
 
                         elif rx == 0 and ry > 0:
                             self.alpha = np.pi/2
-                            self.gamma = np.pi/2
+                            #self.gamma = np.pi/2
                             self.freq = int(np.sqrt((rx)**2 + (ry)**2)*20)
                             
                         elif rx == 0 and ry < 0:
                             self.alpha = -np.pi/2
-                            self.gamma = np.pi/2
+                            #self.gamma = np.pi/2
                             self.freq = int(np.sqrt((rx)**2 + (ry)**2)*20)
                         else:
                             angle = np.arctan2(ry,rx) 
                             self.alpha = round(angle,3)
-                            self.gamma = np.pi/2
+                            #self.gamma = np.pi/2
                             self.freq = int(np.sqrt((rx)**2 + (ry)**2)*20)
 
 
                     if event.axis == 2: #LT
                         lt = round(event.value,2)
                         f = interpolate.interp1d([-1,1], [0,1])  #need to map the -1 to 1 output to 0-1
-                        self.Mz = -round(float(f(lt)),3)
+                        self.Bz = -round(float(f(lt)),3)
                         
     
                     if event.axis == 5: #RT
                         rt = round(event.value,2)
                         f = interpolate.interp1d([-1,1], [0,1])  #need to map the -1 to 1 output to 0-1
-                        self.Mz = round(float(f(rt)),3)
+                        self.Bz = round(float(f(rt)),3)
         
                 #button condition
                 elif event.type == pygame.JOYBUTTONDOWN:

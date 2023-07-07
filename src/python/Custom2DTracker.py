@@ -301,21 +301,19 @@ class Tracker:
         y_2_new = 2* max_height
         new_crop = [int(x_1_new), int(y_1_new), int(x_2_new), int(y_2_new)]
         
-       
+        
 
         # calculate velocity based on last position and self.fps
         #print(pix_2metric)
-        if len(bot.position_list) > 0:
+        if len(bot.position_list) > 5:
             velx = (
-                (current_pos[0] + x_1 - bot.position_list[-1][0])
-                / (pix_2metric)
-                * (fps.get_fps())
+                (current_pos[0] + x_1 - bot.position_list[-5][0])
+                * (fps.get_fps()/5)/ (pix_2metric)
             )
 
             vely = (
-                (current_pos[1] + y_1 - bot.position_list[-1][1])
-                / (pix_2metric)
-                * (fps.get_fps())
+                (current_pos[1] + y_1 - bot.position_list[-5][1])
+                * (fps.get_fps()/5) / (pix_2metric)
                 
             )
 
@@ -405,7 +403,7 @@ class Tracker:
         
 
 
-    def get_fps(self, fps: FPSCounter, frame: np.ndarray):
+    def get_fps(self, fps: FPSCounter, frame: np.ndarray, scaling):
         """
         Compute and display average FPS up to this frame
 
@@ -422,39 +420,43 @@ class Tracker:
 
         w = frame.shape[0]
         h = frame.shape[1]
+        linethickness, thickness, fontScale = scaling
         
         #fps
         cv2.putText(frame,str(int(fps.get_fps())),
             (int(w / 40),int(h / 30)),
-            cv2.FONT_HERSHEY_COMPLEX,
-            0.5,
-            (255, 255, 255),
-            1,
+            cv2.FONT_HERSHEY_SIMPLEX,
+            fontScale=fontScale, 
+            thickness=thickness,
+            color = (255, 255, 255),
+          
         )
         #acoustic freq
         freq = f'{ACOUSTIC_PARAMS["acoustic_freq"]:,} Hz'
         cv2.putText(frame,freq,
             (int(w / 5),int(h / 40)),
-            cv2.FONT_HERSHEY_COMPLEX,
-            0.5,
-            (255, 255, 255),
-            1,
+            cv2.FONT_HERSHEY_SIMPLEX,
+            fontScale=fontScale, 
+            thickness=thickness,
+            color = (255, 255, 255),
+          
         )
 
         # scale bar
         cv2.putText(frame,"100 um",
             (int(w / 40),int(h / 18)),
-            cv2.FONT_HERSHEY_COMPLEX,
-            0.5,
-            (255, 255, 255),
-            1,
+            cv2.FONT_HERSHEY_SIMPLEX,
+            fontScale=fontScale, 
+            thickness=thickness,
+            color = (255, 255, 255),
+          
         )
         cv2.line(
             frame, 
             (int(w / 40),int(h / 14)),
             (int(w / 40) + int(100 * (self.pix_2metric)),int(h / 14)), 
             (255, 255, 255), 
-            3
+            thickness=linethickness
         )
 
 
@@ -472,9 +474,12 @@ class Tracker:
         w = frame.shape[0]
         h = frame.shape[1]
         Bx,By,Bz = MAGNETIC_FIELD_PARAMS["Bx"],MAGNETIC_FIELD_PARAMS["By"],MAGNETIC_FIELD_PARAMS["Bz"]
-        self.projection.draw_sideview(frame, Bx,By,Bz,MAGNETIC_FIELD_PARAMS["alpha"], MAGNETIC_FIELD_PARAMS["gamma"],w,h )
-        self.projection.draw_topview(frame, Bx,By,Bz,MAGNETIC_FIELD_PARAMS["alpha"], MAGNETIC_FIELD_PARAMS["gamma"],w,h )
-        self.get_fps(fps, frame)
+        frame, scaling = self.projection.draw_sideview(frame, Bx,By,Bz,MAGNETIC_FIELD_PARAMS["alpha"], MAGNETIC_FIELD_PARAMS["gamma"],w,h )
+        frame, scaling = self.projection.draw_topview(frame, Bx,By,Bz,MAGNETIC_FIELD_PARAMS["alpha"], MAGNETIC_FIELD_PARAMS["gamma"],w,h )
+        
+        linethickness, thickness, fontScale = scaling
+        
+        self.get_fps(fps, frame, scaling)
         #frame = cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
 
         if len(self.robot_list) > 0:
@@ -493,20 +498,20 @@ class Tracker:
 
                 # display dragon tails
                 pts = np.array(self.robot_list[bot_id].position_list, np.int32)
-                cv2.polylines(frame, [pts], False, bot_color, 2)
+                cv2.polylines(frame, [pts], False, bot_color, linethickness)
                 
 
                 #display target positions
                 targets = self.robot_list[bot_id].trajectory
                 if len(targets) > 0:
                     pts = np.array(self.robot_list[bot_id].trajectory, np.int32)
-                    cv2.polylines(frame, [pts], False, (1, 1, 255), 2)
+                    cv2.polylines(frame, [pts], False, (1, 1, 255), linethickness)
 
 
                     tar = targets[-1]
                     cv2.circle(frame,
                         (int(tar[0]), int(tar[1])),
-                        4,
+                        linethickness,
                         (bot_color),
                         -1,
                     )
@@ -517,23 +522,23 @@ class Tracker:
                 text = "robot {}: {} um | {} blur".format(bot_id+1,dia,blur)
                 
                 cv2.putText(frame, "robot {}".format(bot_id+1), (x, y-10), 
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,0,0), 1)
+                            cv2.FONT_HERSHEY_SIMPLEX,fontScale=fontScale, thickness=thickness,color=(255,0,0))
                 cv2.putText(frame, "~ {}um".format(dia), (x, y+h+20), 
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,255), 1)
+                            cv2.FONT_HERSHEY_SIMPLEX,fontScale=fontScale, thickness=thickness, color = (0,0,255))
                             
                 cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 1)
                 
                 # if there are more than 10 velocities recorded in the robot, get
                 # and display the average velocity
-                if len(self.robot_list[bot_id].velocity_list) > 10:
+                if len(self.robot_list[bot_id].velocity_list) > self.control_params["memory"]:
                     # a "velocity" list is in the form of [x, y, magnitude];
                     # get the magnitude of the 10 most recent velocities, find their
                     # average, and display it on the tracker
-                    vmag = [v.mag for v in self.robot_list[bot_id].velocity_list[-10:]]
+                    vmag = [v.mag for v in self.robot_list[bot_id].velocity_list[-self.control_params["memory"]:]]
                     vmag_avg = round(sum(vmag) / len(vmag),2)
                     
                     cv2.putText(frame, f'{vmag_avg:.1f} um/s', (x, y +h + 40), 
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,255), 1)
+                            cv2.FONT_HERSHEY_SIMPLEX,fontScale=fontScale, thickness=thickness, color=(0,0,255))
                     
                     text = "robot {}: {} um | {} um/s | {} blur".format(bot_id+1,dia,vmag_avg,blur)
                 cv2.putText(
@@ -541,10 +546,11 @@ class Tracker:
                     text,
                     (0, 170 + bot_id * 20),
                     cv2.FONT_HERSHEY_COMPLEX,
-                    0.5,
-                    bot_color,
-                    1,
-                )
+                    fontScale=fontScale, 
+                    thickness=thickness,
+                    color = bot_color,
+                    )
+                
                 
                 
 

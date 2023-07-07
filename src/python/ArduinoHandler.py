@@ -51,7 +51,7 @@ class ArduinoHandler:
         """
         if self.conn is None:
             print("Connection not initialized, message not sent")
-
+            #pass
         else:
             data = [float(Bx), float(By), float(Bz), float(alpha), float(gamma), float(freq)]
             message = self.conn.tx_obj(data)
