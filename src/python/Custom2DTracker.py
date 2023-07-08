@@ -187,7 +187,7 @@ class Tracker:
             del self.robot_var_list[:]
             del self.robot_list[:]
             if params["arduino"].conn is not None:
-                params["arduino"].send(0,0,0, 0, 0, 0)
+                params["arduino"].send(0, 0, 0, 0, 0, 0, 0)
 
             #reset robot checkboxes
             self.robot_window = Frame(master= self.main_window)#Toplevel(self.main_window)
@@ -740,7 +740,7 @@ class Tracker:
 
         
         cv2.destroyAllWindows()
-        arduino.send(0, 0, 0, 0, 0, 0)
+        arduino.send(0, 0, 0, 0, 0, 0, 0)
         for w in self.robot_checklist_list: w.destroy()
         self.robot_window.destroy()
         del self.robot_checklist_list[:]

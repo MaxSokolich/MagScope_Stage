@@ -19,6 +19,7 @@ CONTROL_PARAMS = {
     "rolling_frequency": 1,
     "arrival_thresh": 10,
     "gamma": 90,
+    "psi": 90,
     "memory": 15,
     "PID_params": PID_PARAMS,
 }
@@ -54,4 +55,6 @@ MAGNETIC_FIELD_PARAMS = {
     "Bz": 0,
     "alpha": 0,
     "gamma": 0,
+    "psi": 0,
+    "freq": CONTROL_PARAMS["rolling_frequency"]
 }

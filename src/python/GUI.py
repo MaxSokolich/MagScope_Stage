@@ -550,76 +550,7 @@ class GUI:
         window3 = Toplevel(self.main_window)
         window3.title("ControlParams")
 
-        """#cretae a frame to keep track of upper and low HSV bounds
-        detection_thresh = Frame(master = window3)
-        detection_thresh.pack()
-
-        #lower
-        Label(master = detection_thresh,text= "Lower Threshold (HSV)").grid(row=0,column=0,columnspan=3)
-        Lower_H_Ent = Entry(master=detection_thresh, width=5)
-        Lower_H_Ent.grid(row=1, column=0)
-        Lower_H_Ent.delete(0,END)
-        Lower_H_Ent.insert(0,(str(CONTROL_PARAMS["lower_thresh"][0])))
-        Lower_S_Ent = Entry(master=detection_thresh, width=5)
-        Lower_S_Ent.grid(row=1, column=1)
-        Lower_S_Ent.delete(0,END)
-        Lower_S_Ent.insert(0,(str(CONTROL_PARAMS["lower_thresh"][1])))
-        Lower_V_Ent = Entry(master=detection_thresh, width=5)
-        Lower_V_Ent.grid(row=1, column=2)
-        Lower_V_Ent.delete(0,END)
-        Lower_V_Ent.insert(0,(str(CONTROL_PARAMS["lower_thresh"][2])))
-        
-        lrgb = tuple(round(c * 255) for c in colorsys.hsv_to_rgb(int(Lower_H_Ent.get())/180, int(Lower_S_Ent.get())/255, int(Lower_V_Ent.get())/255))
-       
-        lower_col = Canvas(master = detection_thresh,width=20,height = 20,bg ="#%02x%02x%02x"%lrgb)
-        lower_col.grid(row=1,column=3)
-
-        #upper thresh
-        Label(master = detection_thresh,text= "Upper Threshold (HSV)").grid(row=2,column=0,columnspan=3)
-        Upper_H_Ent = Entry(master=detection_thresh, width=5)
-        Upper_H_Ent.grid(row=3, column=0)
-        Upper_H_Ent.delete(0,END)
-        Upper_H_Ent.insert(0,(str(CONTROL_PARAMS["upper_thresh"][0])))
-        Upper_S_Ent = Entry(master=detection_thresh, width=5)
-        Upper_S_Ent.grid(row=3, column=1)
-        Upper_S_Ent.delete(0,END)
-        Upper_S_Ent.insert(0,(str(CONTROL_PARAMS["upper_thresh"][1])))
-        Upper_V_Ent = Entry(master=detection_thresh, width=5)
-        Upper_V_Ent.grid(row=3, column=2)
-        Upper_V_Ent.delete(0,END)
-        Upper_V_Ent.insert(0,(str(CONTROL_PARAMS["upper_thresh"][2])))
-
-        urgb = tuple(round(c * 255) for c in colorsys.hsv_to_rgb(int(Upper_H_Ent.get())/180, int(Upper_S_Ent.get())/255, int(Upper_V_Ent.get())/255))
-        upper_col = Canvas(master = detection_thresh,width=20,height = 20,bg = "#%02x%02x%02x"%urgb)
-        upper_col.grid(row=3,column=3)
-
-
-        def apply_thresh():
-            CONTROL_PARAMS["lower_thresh"] = np.array([int(Lower_H_Ent.get()),int(Lower_S_Ent.get()),int(Lower_V_Ent.get())])
-            CONTROL_PARAMS["upper_thresh"] = np.array([int(Upper_H_Ent.get()),int(Upper_S_Ent.get()),int(Upper_V_Ent.get())])
-
-            lrgb = tuple(round(c * 255) for c in colorsys.hsv_to_rgb(int(Lower_H_Ent.get())/180, int(Lower_S_Ent.get())/255, int(Lower_V_Ent.get())/255))
-            lower_col.config(bg ="#%02x%02x%02x"%lrgb)
-
-            urgb = tuple(round(c * 255) for c in colorsys.hsv_to_rgb(int(Upper_H_Ent.get())/180, int(Upper_S_Ent.get())/255, int(Upper_V_Ent.get())/255))
-            upper_col.config(bg = "#%02x%02x%02x"%urgb)
-           
-
-    
-
-        #apply thresh
-        apply_thresh_but = Button(detection_thresh, 
-            text="Apply", 
-            width=10, 
-            height=1, 
-            command=apply_thresh, 
-            bg = 'black',
-            fg= 'white')
-        
-        apply_thresh_but.grid(row=4,column=0,columnspan = 3)"""
-
-        
-        
+      
         
         #handle sliders
         def update_loop_slider_values(event):
@@ -638,12 +569,12 @@ class GUI:
             CONTROL_PARAMS["blur_thresh"] = int(blur_thresh_slider.get())
             CONTROL_PARAMS["initial_crop"] = int(initial_crop_slider.get())
             CONTROL_PARAMS["tracking_frame"] = int(tracking_frame_slider.get())
-            CONTROL_PARAMS["avg_bot_size"] = int(avg_bot_size_slider.get())
+            CONTROL_PARAMS["memory"] = int(memory_slider.get())
             ACOUSTIC_PARAMS["min_vel"] = float(minvel_slider.get())
             CONTROL_PARAMS["rolling_frequency"] = int(rolling_freq_slider.get())
             CONTROL_PARAMS["arrival_thresh"] = int(arrival_thresh_slider.get())
             CONTROL_PARAMS["gamma"] = int(gamma_slider.get())
-            CONTROL_PARAMS["memory"] = int(memory_slider.get())
+            CONTROL_PARAMS["psi"] = int(psi_slider.get())
 
             self.main_window.update()
 
@@ -651,13 +582,13 @@ class GUI:
         upper_thresh = DoubleVar()
         blur_thresh = DoubleVar()
         initial_crop = DoubleVar()
-        avg_bot_size = DoubleVar()
+        memory = DoubleVar()
         tracking_frame = DoubleVar()
         minvel = DoubleVar()
         rolling_frequency = DoubleVar()
         arrival_thresh = DoubleVar()
         gamma = DoubleVar()
-        memory = DoubleVar()
+        psi = DoubleVar()
 
         lower_thresh_slider = Scale(
             master=window3,
@@ -720,13 +651,13 @@ class GUI:
             orient=HORIZONTAL,
             command=update_loop_slider_values,
         )
-        avg_bot_size_slider = Scale(
+        memory_slider = Scale(
             master=window3,
-            label="~ avg size (um)",
+            label="memory",
             from_=1,
-            to=200,
+            to=100,
             resolution=1,
-            variable=avg_bot_size,
+            variable=memory,
             width=20,
             length=200,
             orient=HORIZONTAL,
@@ -783,13 +714,13 @@ class GUI:
             orient=HORIZONTAL,
             command=update_loop_slider_values,
         )
-        memory_slider = Scale(
+        psi_slider = Scale(
             master=window3,
-            label="memory",
-            from_=1,
-            to=100,
+            label="psi",
+            from_=0,
+            to=90,
             resolution=1,
-            variable=memory,
+            variable=psi,
             width=20,
             length=200,
             orient=HORIZONTAL,
@@ -801,24 +732,25 @@ class GUI:
         blur_thresh_slider.set(CONTROL_PARAMS["blur_thresh"])
         initial_crop_slider.set(CONTROL_PARAMS["initial_crop"])
         tracking_frame_slider.set(CONTROL_PARAMS["tracking_frame"])
-        avg_bot_size_slider.set(CONTROL_PARAMS["avg_bot_size"])
+        memory_slider.set(CONTROL_PARAMS["memory"])
         minvel_slider.set(ACOUSTIC_PARAMS["min_vel"])
         rolling_freq_slider.set(CONTROL_PARAMS["rolling_frequency"])
         arrival_thresh_slider.set(CONTROL_PARAMS["arrival_thresh"])
         gamma_slider.set(CONTROL_PARAMS["gamma"])
-        memory_slider.set(CONTROL_PARAMS["memory"])
+        psi_slider.set(CONTROL_PARAMS["psi"])
 
         lower_thresh_slider.pack()
         upper_thresh_slider.pack()
         blur_thresh_slider.pack()
         initial_crop_slider.pack()
         tracking_frame_slider.pack()
-        avg_bot_size_slider.pack()
+        memory_slider.pack()
         minvel_slider.pack()
         rolling_freq_slider.pack()
         arrival_thresh_slider.pack()
         gamma_slider.pack()
         memory_slider.pack()
+        psi_slider.pack()
 
     def edit_camera_params(self):
         """
@@ -1242,7 +1174,7 @@ class GUI:
         self.text_box.see("end")
 
         #self.tracker.robot_window.destroy()
-        self.arduino.send(0,0,0, 0, 0, 0)
+        self.arduino.send(0,0,0,0,0,0,0)
         self.AcousticModule.stop()
         ACOUSTIC_PARAMS["acoustic_freq"] = 0
 
@@ -1313,12 +1245,12 @@ class GUI:
         """
         try:
             actions = j_queue.get(0)
-            alpha = actions[6] - np.pi/2 #subtract 90 for rolling
-            #CONTROL_PARAMS["rolling_frequency"] = actions[8]
-            
-            gamma = CONTROL_PARAMS["gamma"]  * np.pi/180
 
-            if actions[8] != 0:
+            alpha = actions[6] - np.pi/2 #subtract 90 for rolling 
+            gamma = CONTROL_PARAMS["gamma"]  * np.pi/180
+            psi = CONTROL_PARAMS["psi"]  * np.pi/180
+
+            if actions[8] != 0:  
                 freq = CONTROL_PARAMS["rolling_frequency"]
             else:
                 freq = 0
@@ -1329,8 +1261,10 @@ class GUI:
             MAGNETIC_FIELD_PARAMS["Bz"] = actions[2]
             MAGNETIC_FIELD_PARAMS["alpha"] = alpha
             MAGNETIC_FIELD_PARAMS["gamma"] = gamma
+            MAGNETIC_FIELD_PARAMS["psi"] = psi
+            MAGNETIC_FIELD_PARAMS["freq"] = freq
             
-            self.arduino.send(actions[0], actions[1], actions[2], alpha, gamma, freq)
+            self.arduino.send(actions[0], actions[1], actions[2], alpha, gamma, psi, freq)
 
                 
         except Empty:

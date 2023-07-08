@@ -195,7 +195,7 @@ class PID_Algorithm:
                
             )
            
-            arduino.send(input1,input2,input3,0,0,0)
+            arduino.send(input1,input2,input3,0,0,0,0)
 
             
 

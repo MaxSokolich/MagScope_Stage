@@ -285,7 +285,6 @@ class Acoustic_Algorithm:
         
             
         actions = [self.Bx, self.By, self.Bz, self.alpha, self.resistance, self.min_freq, self.current_freq, self.max_freq, self.optimal_freq] #chaning the actions to better align with acoustic bots
-        print(actions)
-        #arduino.send(self.Bx, self.By, self.Bz, 0, 0, 0)
+        arduino.send(self.Bx, self.By, self.Bz,0,0,0,0)
     
         

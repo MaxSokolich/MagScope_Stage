@@ -55,6 +55,6 @@ class AlgorithmHandler:
 
 
         else: 
-            arduino.send(0, 0, 0, 0, 0, 0)
+            arduino.send(0, 0, 0, 0, 0, 0, 0)
     
         

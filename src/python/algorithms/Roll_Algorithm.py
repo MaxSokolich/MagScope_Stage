@@ -79,11 +79,15 @@ class Roll_Algorithm:
                 
                 #OUTPUT SIGNAL
                 my_alpha = self.alpha - np.pi/2  #subtract 90 for roll
-                input1 = round(my_alpha,2)
-                input2 = self.control_params["rolling_frequency"]
-                input3 = self.control_params["gamma"] * np.pi/180
-                MAGNETIC_FIELD_PARAMS["alpha"] = input1
-                MAGNETIC_FIELD_PARAMS["gamma"] = input3
+                alpha = round(my_alpha,2)
+                gamma = self.control_params["gamma"] * np.pi/180
+                psi = self.control_params["psi"] * np.pi/180
+                freq = self.control_params["rolling_frequency"]
+                
+                MAGNETIC_FIELD_PARAMS["alpha"] = alpha
+                MAGNETIC_FIELD_PARAMS["gamma"] = gamma
+                MAGNETIC_FIELD_PARAMS["psi"] = psi
+                MAGNETIC_FIELD_PARAMS["freq"] = freq
                 
         
             
@@ -91,12 +95,12 @@ class Roll_Algorithm:
                 error,
                 [robotx, roboty],
                 [targetx, targety],
-                self.alpha,
+                alpha,
                 self.control_params["rolling_frequency"],
                 time.time()-self.start,
                 )
 
             
-            arduino.send(0,0,0, input1, input3, input2)
+            arduino.send(0,0,0, alpha, gamma, psi, freq)
 
             

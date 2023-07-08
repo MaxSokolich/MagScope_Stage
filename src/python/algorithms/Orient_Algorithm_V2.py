@@ -170,7 +170,7 @@ class Orient_Algorithm:
                 time.time()-self.start,
             )
             #arduino.send(typ,input1,input2,input3)
-            arduino.send(input1,input2,input3, 0, 0, 0)
+            arduino.send(input1,input2,input3,0,0,0,0)
 
             
 

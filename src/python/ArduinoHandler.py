@@ -41,7 +41,7 @@ class ArduinoHandler:
                 f"Connection already initialized at port {self.port}, new port {port} ignored"
             )
 
-    def send(self, Bx: float, By: float, Bz: float, alpha: float, gamma: float, freq: float) -> None:
+    def send(self, Bx: float, By: float, Bz: float, alpha: float, gamma: float, psi: float, freq: float) -> None:
         """
         sends action commands to arduino
 
@@ -53,7 +53,7 @@ class ArduinoHandler:
             print("Connection not initialized, message not sent")
             #pass
         else:
-            data = [float(Bx), float(By), float(Bz), float(alpha), float(gamma), float(freq)]
+            data = [float(Bx), float(By), float(Bz), float(alpha), float(gamma), float(psi), float(freq)]
             message = self.conn.tx_obj(data)
             self.conn.send(message)
             print("Data sent:", data)
@@ -71,7 +71,7 @@ class ArduinoHandler:
             print("Connection not initialized, ignoring close() call")
         else:
             print(f"Closing connection at port {self.port}")
-            self.send(0,0,0,0,0,0)
+            self.send(0,0,0,0,0,0,0)
             self.conn.close()
             
 

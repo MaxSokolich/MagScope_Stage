@@ -10,7 +10,7 @@
 
 #include "SerialTransfer.h"
 SerialTransfer myTransfer;
-float action[6]; //an array to store incoming data from python
+float action[7]; //an array to store incoming data from python
 
 #define PI 3.1415926535897932384626433832795
 
@@ -25,6 +25,13 @@ float By_roll;
 float Bz_roll;
 float alpha;
 float gamma;
+
+float psi;
+float BxPer;
+float ByPer;
+float BzPer;
+float c; 
+
 float rolling_frequency;
 
 //other
@@ -302,7 +309,8 @@ void loop()
    
    alpha = action[3];
    gamma = action[4];
-   rolling_frequency = action[5]; 
+   psi = action[5]; 
+   rolling_frequency = action[6]; 
    omega = 2*PI*rolling_frequency;
    
    tim = micros() % 7812500;
@@ -314,30 +322,46 @@ void loop()
        Bz_roll = 0;
       }
    else {
-       //Bx_roll = ( -sin(gamma)*cos(alpha)*cos(omega*t) + sin(alpha)*sin(omega*t));
-       //By_roll = ( -cos(gamma)*sin(alpha)*cos(omega*t) + cos(alpha)*sin(omega*t)); 
-       //Bz_roll = ( sin(gamma)*cos(omega*t));
-
+      //correct equations 7/8/23
        Bx_roll = (-sin(alpha) * sin(omega*t)) + (-cos(alpha) * cos(gamma)  * cos(omega*t)); 
        By_roll =  (cos(alpha) * sin(omega*t)) + (-sin(alpha) * cos(gamma) *  cos(omega*t)); 
        Bz_roll = sin(gamma) * cos(omega*t);
+
+       // condition for perpendicular field
+       if (psi < PI/2){
+            c = 1/tan(psi);
+            BxPer = c* cos(alpha) * sin(gamma);
+            ByPer = tan(alpha) * BxPer;
+            BzPer = BxPer * (1/cos(alpha)) * (1/tan(gamma));
+       }
+       else{
+            BxPer = 0;
+            ByPer = 0;
+            BzPer = 0;
+            c = 0;
+       }
+
+       // superimpose the rolling field with the perpendicular field
+       Bx_roll = (Bx_roll + Bx_Per) / (1+c);
+       By_roll = (By_roll + By_Per) / (1+c);
+       Bz_roll = (Bz_roll + Bz_Per) / (1+c);
+      
       }
    
-
-   
-
    
    //need to add unform field with rotating field and normalize
    Bx = (action[0] + Bx_roll);
    By = (action[1] + By_roll);
    Bz = (action[2] + Bz_roll); 
 
+
+   // condition to prevent divide by zero when total Bx, By, Bz are off aka zeroed
    if (Bx == 0 and By == 0 and Bz ==0){
         Bx = 0;
         By = 0;
         Bz = 0;
    }
-   
+   // otherwise I need to normalize the superpoistion of the rotating field with the uniform field
    else{
        Bx = Bx / sqrt(Bx*Bx + By*By + Bz*Bz);
        By = By / sqrt(Bx*Bx + By*By + Bz*Bz);
