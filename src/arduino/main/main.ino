@@ -14,8 +14,6 @@ float action[7]; //an array to store incoming data from python
 
 #define PI 3.1415926535897932384626433832795
 
-
-
 //actions
 float Bx;
 float By;
@@ -238,7 +236,6 @@ void set4(float DC4){
     analogWrite(Coil4_PWML,0);
    
   }
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -323,39 +320,31 @@ void loop()
       }
    else {
       //correct equations 7/8/23
-       Bx_roll = (-sin(alpha) * sin(omega*t)) + (-cos(alpha) * cos(gamma)  * cos(omega*t)); 
-       By_roll =  (cos(alpha) * sin(omega*t)) + (-sin(alpha) * cos(gamma) *  cos(omega*t)); 
-       Bz_roll = sin(gamma) * cos(omega*t);
+      Bx_roll = (-sin(alpha) * sin(omega*t)) + (-cos(alpha) * cos(gamma)  * cos(omega*t)); 
+      By_roll =  (cos(alpha) * sin(omega*t)) + (-sin(alpha) * cos(gamma) *  cos(omega*t)); 
+      Bz_roll = sin(gamma) * cos(omega*t);
 
-       // condition for perpendicular field
-       if (psi < PI/2){
-            c = 1/tan(psi);
-            BxPer = c* cos(alpha) * sin(gamma);
-            ByPer = tan(alpha) * BxPer;
-            BzPer = BxPer * (1/cos(alpha)) * (1/tan(gamma));
-       }
-       else{
-            BxPer = 0;
-            ByPer = 0;
-            BzPer = 0;
-            c = 0;
-       }
+       // condition for perpendicular field, if psi = 90, everything below is zero
+      c = 1/tan(psi);
+      BxPer = c* cos(alpha) * sin(gamma);
+      ByPer = tan(alpha) * BxPer;
+      BzPer = BxPer * (1/cos(alpha)) * (1/tan(gamma));
+       
+     
 
        // superimpose the rolling field with the perpendicular field
-       Bx_roll = (Bx_roll + Bx_Per) / (1+c);
-       By_roll = (By_roll + By_Per) / (1+c);
-       Bz_roll = (Bz_roll + Bz_Per) / (1+c);
+      Bx_roll = (Bx_roll + Bx_Per) / (1+c);
+      By_roll = (By_roll + By_Per) / (1+c);
+      Bz_roll = (Bz_roll + Bz_Per) / (1+c);
       
       }
-   
-   
    //need to add unform field with rotating field and normalize
    Bx = (action[0] + Bx_roll);
    By = (action[1] + By_roll);
    Bz = (action[2] + Bz_roll); 
 
 
-   // condition to prevent divide by zero when total Bx, By, Bz are off aka zeroed
+   // condition to prevent divide by zero error when total Bx, By, Bz are off aka zeroed
    if (Bx == 0 and By == 0 and Bz ==0){
         Bx = 0;
         By = 0;

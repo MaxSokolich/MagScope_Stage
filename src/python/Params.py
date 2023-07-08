@@ -54,7 +54,7 @@ MAGNETIC_FIELD_PARAMS = {
     "By": 0,
     "Bz": 0,
     "alpha": 0,
-    "gamma": 0,
-    "psi": 0,
+    "gamma": CONTROL_PARAMS["gamma"],
+    "psi": CONTROL_PARAMS["psi"],
     "freq": CONTROL_PARAMS["rolling_frequency"]
 }

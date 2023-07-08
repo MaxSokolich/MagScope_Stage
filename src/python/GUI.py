@@ -717,7 +717,7 @@ class GUI:
         psi_slider = Scale(
             master=window3,
             label="psi",
-            from_=0,
+            from_=1,
             to=90,
             resolution=1,
             variable=psi,
