@@ -35,7 +35,7 @@ class Orient_Algorithm:
 #         self.costheta_maps = np.array([])#added this so that we store the mapped angles
 #         self.sintheta_maps = np.array([])#added this so that we store the mapped angles
         self.theta_maps = np.array([])#added this so that we store the mapped angles
-
+        self.theta = 0
 
     def control_trajectory(self, frame: np.ndarray, arduino: ArduinoHandler, robot_list, control_params):
         """
@@ -110,10 +110,10 @@ class Orient_Algorithm:
                     if vd != 0 and bd != 0:
                         costheta = np.dot(vel_bot, self.B_vec) / (vd * bd)
                         sintheta = (vel_bot[0] * self.B_vec[1] - vel_bot[1] * self.B_vec[0]) / (vd * bd)
-                        theta = np.arctan2(sintheta,costheta)
+                        self.theta = np.arctan2(sintheta,costheta)
                 
                     
-                    if not np.isnan(vd):
+                    #if not np.isnan(vd):
                         #this takes the average of cosine and sine, but I changed it to just average theta since that might make more sense
 #                         np.append(self.costheta_maps,costheta)
 #                         np.append(self.sintheta_maps,sintheta)
@@ -124,7 +124,7 @@ class Orient_Algorithm:
 #                         costhetaNew = costhetaNew/normFactor
 #                         sinthetaNew = sinthetaNew/normFactor #this makes sure that the sin**2+cos**2 = 1 while not changing the angle itself
 
-                        self.theta_maps = np.append(self.theta_maps,theta)
+                        self.theta_maps = np.append(self.theta_maps,self.theta)
                 
                         if len(self.theta_maps) > 150:
                             self.theta_maps = self.theta_maps[-150:len(self.theta_maps)]#this makes sure that we only look at the latest 150 frames of data to keep it adaptable. It should be bigger if there's a lot of noise (slow bot) and smaller if its traj is well defined (fast bot) 
