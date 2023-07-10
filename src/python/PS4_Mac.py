@@ -16,6 +16,7 @@ class MyController:
         self.alpha, self.gamma, self.freq = 0,0,0
         self.acoustic_status = 0
 
+        self.angle = 0
 
         #initilize class arguments
         self.queue = None
@@ -48,7 +49,7 @@ class MyController:
        
         # Main loop
         while True:
-            clock.tick(100) #ms
+            clock.tick(70) #ms
             # Check for joystick events
             for event in pygame.event.get():
                 #axis condition
@@ -67,6 +68,8 @@ class MyController:
                     if event.axis == 2: #RY
                         rx = self.deadzone(event.value)
                         ry = -self.deadzone(joystick.get_axis(3))
+                                        
+                     
                 
                         if rx == 0 and ry == 0:
                             self.alpha = 0
@@ -81,9 +84,10 @@ class MyController:
                             self.alpha = -np.pi/2
                             self.freq = int(np.sqrt((rx)**2 + (ry)**2)*20)
                         else:
-                            angle = np.arctan2(ry,rx) - np.pi/2 
+                            angle = np.arctan2(ry,rx) 
                             self.alpha = round(angle,3)
                             self.freq = int(np.sqrt((rx)**2 + (ry)**2)*20)
+                        
 
 
                     if event.axis == 4: #LT
@@ -146,7 +150,8 @@ class MyController:
                    self.gamma, 
                    self.freq,
                    self.acoustic_status]
-            
+
+            print(self.alpha)
             #add action commands to queue
             self.queue.put(self.actions)
             #print(self.actions)

@@ -101,6 +101,6 @@ class Roll_Algorithm:
                 )
 
             
-            arduino.send(0,0,0, alpha, gamma, psi, freq)
+            arduino.send(0,0,0, alpha, gamma, freq, psi)
 
             

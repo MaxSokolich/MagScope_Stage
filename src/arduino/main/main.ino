@@ -306,8 +306,8 @@ void loop()
    
    alpha = action[3];
    gamma = action[4];
-   psi = action[5]; 
-   rolling_frequency = action[6]; 
+   rolling_frequency = action[5]; 
+   psi = action[6]; 
    omega = 2*PI*rolling_frequency;
    
    tim = micros() % 7812500;
@@ -325,7 +325,8 @@ void loop()
       Bz_roll = sin(gamma) * cos(omega*t);
 
        // condition for perpendicular field (psi cannot be 90)
-      if (psi != 90){
+       // condition for perpendicular field (psi cannot be 90)
+      if (psi < PI/2){
           c = 1/tan(psi);
           BxPer = c* cos(alpha) * sin(gamma);
           ByPer = tan(alpha) * BxPer;
@@ -338,8 +339,6 @@ void loop()
           BzPer = 0;
       }
        
-     
-
        // superimpose the rolling field with the perpendicular field
       Bx_roll = (Bx_roll + BxPer) / (1+c);
       By_roll = (By_roll + ByPer) / (1+c);

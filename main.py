@@ -11,7 +11,7 @@ from src.python.GUI import GUI
 from src.python.ArduinoHandler import ArduinoHandler
 
 
-PORT = "/dev/ttyACM0"
+PORT = "/dev/cu.usbmodem11401"#"/dev/ttyACM0"
 
 
 if __name__ == "__main__":
