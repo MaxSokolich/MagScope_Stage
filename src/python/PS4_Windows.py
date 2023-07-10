@@ -55,7 +55,7 @@ class MyController:
                 if event.type == pygame.JOYAXISMOTION:
                     # Joystick movement event
                     if event.axis == 1:  #LY
-                        ly = self.deadzone(event.value)
+                        ly = -self.deadzone(event.value)
                         self.By = round(ly,3)
                      
                     if event.axis == 0: #LX
@@ -64,25 +64,23 @@ class MyController:
 
                     if event.axis == 2 or event.axis == 3: #RY
                         rx = self.deadzone(joystick.get_axis(2))
-                        ry = self.deadzone(joystick.get_axis(3))
+                        ry = -self.deadzone(joystick.get_axis(3))
+                 
                         if rx == 0 and ry == 0:
                             self.alpha = 0
                             self.gamma = 0
                             self.freq = 0
 
                         elif rx == 0 and ry > 0:
-                            self.alpha = 0
-                            self.gamma = np.pi/2
+                            self.alpha = np.pi/2
                             self.freq = int(np.sqrt((rx)**2 + (ry)**2)*20)
                             
                         elif rx == 0 and ry < 0:
-                            self.alpha = -np.pi
-                            self.gamma = np.pi/2
+                            self.alpha = -np.pi/2
                             self.freq = int(np.sqrt((rx)**2 + (ry)**2)*20)
                         else:
-                            angle = np.arctan2(ry,rx) - np.pi/2 
+                            angle = np.arctan2(ry,rx) 
                             self.alpha = round(angle,3)
-                            self.gamma = np.pi/2
                             self.freq = int(np.sqrt((rx)**2 + (ry)**2)*20)
 
 
