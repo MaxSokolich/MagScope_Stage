@@ -62,8 +62,8 @@ class MyController:
                         lx = self.deadzone(event.value)
                         self.Bx = round(lx,3)
 
-                    if event.axis == 2: #RY
-                        rx = self.deadzone(event.value)
+                    if event.axis == 2 or event.axis == 3: #RY
+                        rx = self.deadzone(joystick.get_axis(2))
                         ry = self.deadzone(joystick.get_axis(3))
                         if rx == 0 and ry == 0:
                             self.alpha = 0
@@ -89,13 +89,13 @@ class MyController:
                     if event.axis == 4: #LT
                         lt = round(event.value,2)
                         f = interpolate.interp1d([-1,1], [0,1])  #need to map the -1 to 1 output to 0-1
-                        self.Mz = -round(float(f(lt)),3)
+                        self.Bz = -round(float(f(lt)),3)
                         
     
                     if event.axis == 5: #RT
                         rt = round(event.value,2)
                         f = interpolate.interp1d([-1,1], [0,1])  #need to map the -1 to 1 output to 0-1
-                        self.Mz = round(float(f(rt)),3)
+                        self.Bz = round(float(f(rt)),3)
         
                 #button condition
                 elif event.type == pygame.JOYBUTTONDOWN:

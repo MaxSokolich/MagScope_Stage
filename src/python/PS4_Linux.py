@@ -3,7 +3,7 @@ import pygame
 import time
 import numpy as np
 from scipy import interpolate
-from src.python.Params import CONTROL_PARAMS
+
 
 class MyController:
     """
@@ -16,7 +16,9 @@ class MyController:
         self.alpha, self.gamma, self.freq = 0,0,0
         self.acoustic_status = 0
 
+        self.rx, self.ry = 0,0
 
+        self.alpha2 = 0
         #initilize class arguments
         self.queue = None
         self.arduino = None
@@ -25,7 +27,7 @@ class MyController:
         """
         accepts a value [0,1] and if its less than .2 make it zero otherwise use the value. limits joystick noise
         """
-        if abs(value) < .2:
+        if abs(value) < .1:
             return 0
         else:
             return value
@@ -64,9 +66,10 @@ class MyController:
                         lx = self.deadzone(event.value)
                         self.Bx = round(lx,3)
 
-                    if event.axis == 4: #RY
-                        ry = -self.deadzone(event.value)
-                        rx = self.deadzone(joystick.get_axis(3))
+                    if event.axis == 4 or event.axis == 3: #RY
+                        ry = -round(self.deadzone(joystick.get_axis(4)),3)
+                        rx = round(self.deadzone(joystick.get_axis(3)),3)
+            
                        
                         if rx == 0 and ry == 0:
                             self.alpha = 0
@@ -153,10 +156,9 @@ class MyController:
                    self.freq,
                    self.acoustic_status]
             
-            print(self.alpha *180/np.pi)
+            
             #add action commands to queue
             self.queue.put(self.actions)
             #self.arduino.send(self.Bx,self.By,self.Bz, self.alpha, self.gamma, self.freq)
              
         
-         

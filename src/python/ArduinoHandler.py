@@ -57,7 +57,7 @@ class ArduinoHandler:
             data = [float(Bx), float(By), float(Bz), float(alpha), float(gamma), float(freq),float(psi)]
             message = self.conn.tx_obj(data)
             self.conn.send(message)
-            #print("Data sent:", data)
+            print("Data sent:", data)
 
     def close(self) -> None:
         """
