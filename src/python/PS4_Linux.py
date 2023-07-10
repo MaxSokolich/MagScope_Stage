@@ -153,6 +153,7 @@ class MyController:
                    self.freq,
                    self.acoustic_status]
             
+            print(self.alpha *180/np.pi)
             #add action commands to queue
             self.queue.put(self.actions)
             #self.arduino.send(self.Bx,self.By,self.Bz, self.alpha, self.gamma, self.freq)

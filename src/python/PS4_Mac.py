@@ -16,8 +16,6 @@ class MyController:
         self.alpha, self.gamma, self.freq = 0,0,0
         self.acoustic_status = 0
 
-        self.angle = 0
-
         #initilize class arguments
         self.queue = None
     
@@ -66,11 +64,9 @@ class MyController:
               
 
                     if event.axis == 2: #RY
-                        rx = self.deadzone(event.value)
                         ry = -self.deadzone(joystick.get_axis(3))
-                                        
-                     
-                
+                        rx = self.deadzone(event.value)
+                        
                         if rx == 0 and ry == 0:
                             self.alpha = 0
                             self.gamma = 0
