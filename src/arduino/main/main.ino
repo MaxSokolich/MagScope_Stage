@@ -324,18 +324,26 @@ void loop()
       By_roll =  (cos(alpha) * sin(omega*t)) + (-sin(alpha) * cos(gamma) *  cos(omega*t)); 
       Bz_roll = sin(gamma) * cos(omega*t);
 
-       // condition for perpendicular field, if psi = 90, everything below is zero
-      c = 1/tan(psi);
-      BxPer = c* cos(alpha) * sin(gamma);
-      ByPer = tan(alpha) * BxPer;
-      BzPer = BxPer * (1/cos(alpha)) * (1/tan(gamma));
+       // condition for perpendicular field (psi cannot be 90)
+      if (psi != 90){
+          c = 1/tan(psi);
+          BxPer = c* cos(alpha) * sin(gamma);
+          ByPer = tan(alpha) * BxPer;
+          BzPer = BxPer * (1/cos(alpha)) * (1/tan(gamma));  
+          }
+      else{
+          c = 0;
+          BxPer = 0;
+          ByPer = 0;
+          BzPer = 0;
+      }
        
      
 
        // superimpose the rolling field with the perpendicular field
-      Bx_roll = (Bx_roll + Bx_Per) / (1+c);
-      By_roll = (By_roll + By_Per) / (1+c);
-      Bz_roll = (Bz_roll + Bz_Per) / (1+c);
+      Bx_roll = (Bx_roll + BxPer) / (1+c);
+      By_roll = (By_roll + ByPer) / (1+c);
+      Bz_roll = (Bz_roll + BzPer) / (1+c);
       
       }
    //need to add unform field with rotating field and normalize
