@@ -668,14 +668,14 @@ class Tracker:
             
             # add videos a seperate list to save space and write the video afterwords
             if self.status_params["record_status"]:
-                output_name = "src/videos/" + self.camera_params["outputname"]
+                output_name = self.camera_params["outputname"]
                 if rec_start_time is None:
                     rec_start_time = time.time()
 
                 if result is None:
                     print(resize_ratio)
                     result = cv2.VideoWriter(
-                        output_name + ".mp4",
+                        "src/videos/"+output_name + ".mp4",
                         cv2.VideoWriter_fourcc(*"mp4v"),
                         int(self.camera_params["framerate"]),    
                         resize_ratio, 
