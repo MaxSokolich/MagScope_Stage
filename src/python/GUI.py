@@ -944,7 +944,7 @@ class GUI:
             resolution=1000,
             variable=acoustic_frequency,
             width=50,
-            length=1000,
+            length=500,
             orient=HORIZONTAL,
             command=update_loop_slider_values,
         )
@@ -962,7 +962,7 @@ class GUI:
             resolution=.1,
             variable=acoustic_amplitude,
             width=50,
-            length=1000,
+            length=500,
             orient=HORIZONTAL,
             command=update_loop_slider_values,
         )

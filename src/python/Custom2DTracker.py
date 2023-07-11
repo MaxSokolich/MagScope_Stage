@@ -459,6 +459,27 @@ class Tracker:
             thickness=linethickness
         )
 
+        psi = "psi: "+ str(CONTROL_PARAMS["psi"])
+        cv2.putText(frame,psi,
+            (int(w* (9/10)),int(h / 40)),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            fontScale=fontScale, 
+            thickness=thickness,
+            color = (255, 255, 255),
+          
+        )
+
+        gamma = "gamma: " +str(CONTROL_PARAMS["gamma"])
+        cv2.putText(frame,gamma,
+            (int(w ),int(h / 40)),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            fontScale=fontScale, 
+            thickness=thickness,
+            color = (255, 255, 255),
+          
+        )
+
+
 
         
 
