@@ -87,7 +87,7 @@ class Orient_Algorithm:
                     bd = np.linalg.norm(self.B_vec)
 
                     costheta = np.dot(vel_bot, self.B_vec) / (vd * bd)
-                    theta = np.arcos(costheta)
+                    theta = np.arccos(costheta)
                     
                     sintheta = (vel_bot[0] * self.B_vec[1] - vel_bot[1] * self.B_vec[0]) / (vd * bd)
                 

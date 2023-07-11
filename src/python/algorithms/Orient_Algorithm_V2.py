@@ -98,6 +98,7 @@ class Orient_Algorithm:
                 # OUTPUT SIGNAL
                 bot = self.robot_list[-1]
                 if len(bot.velocity_list) >= self.control_params["memory"]:
+                  
                     
                     #find the velocity avearge over the last memory number of frames to mitigate noise: 
                     vx = np.mean(np.array([v.x for v in bot.velocity_list[-self.control_params["memory"]:]]))
@@ -106,24 +107,15 @@ class Orient_Algorithm:
                     vel_bot = np.array([vx, vy])  # current velocity of self propelled robot
                     vd = np.linalg.norm(vel_bot)
                     bd = np.linalg.norm(self.B_vec)
-
+                    
                     if vd != 0 and bd != 0:
                         costheta = np.dot(vel_bot, self.B_vec) / (vd * bd)
                         sintheta = (vel_bot[0] * self.B_vec[1] - vel_bot[1] * self.B_vec[0]) / (vd * bd)
-                        self.theta = np.arctan2(sintheta,costheta)
-                
-                    
-                    #if not np.isnan(vd):
-                        #this takes the average of cosine and sine, but I changed it to just average theta since that might make more sense
-#                         np.append(self.costheta_maps,costheta)
-#                         np.append(self.sintheta_maps,sintheta)
-            
-#                         costhetaNew = np.median(self.costheta_maps)#take the average, or median, so that the mapped angle is robust to noise
-#                         sinthetaNew = np.median(self.sintheta_maps)
-#                         normFactor = costhetaNew**2 + sinthetaNew**2
-#                         costhetaNew = costhetaNew/normFactor
-#                         sinthetaNew = sinthetaNew/normFactor #this makes sure that the sin**2+cos**2 = 1 while not changing the angle itself
+                        self.theta = (np.degrees(np.arccos(costheta)) + 360) % 360
+                        
+                        #print(self.theta)
 
+                        self.theta = np.radians(self.theta)
                         self.theta_maps = np.append(self.theta_maps,self.theta)
                 
                         if len(self.theta_maps) > 150:
@@ -132,12 +124,12 @@ class Orient_Algorithm:
                         self.T_R = np.array([[np.cos(thetaNew), -np.sin(thetaNew)], [np.sin(thetaNew), np.cos(thetaNew)]])
                      
                         #self.T_R = np.array([[costhetaNew, -sinthetaNew], [sinthetaNew, costhetaNew]])
-
+                  
                 self.B_vec = np.dot(self.T_R, direction_vec)
 
                 #OUTPUT SIGNAL      
                 
-                Bx = self.B_vec[0] / np.sqrt(self.B_vec[0] ** 2 + self.B_vec[1] ** 2)
+                Bx = STATUS_PARAMS["orientsign"]*self.B_vec[0] / np.sqrt(self.B_vec[0] ** 2 + self.B_vec[1] ** 2)
                 By = self.B_vec[1] / np.sqrt(self.B_vec[0] ** 2 + self.B_vec[1] ** 2)
                 Bz = 0
                 self.alpha = np.arctan2(By, Bx)

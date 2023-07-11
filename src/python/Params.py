@@ -10,7 +10,7 @@ PID_PARAMS = {
 
 CONTROL_PARAMS = {
     "lower_thresh": 0,#np.array([0,0,0]),  #HSV
-    "upper_thresh": 100,#np.array([180,255,140]),  #HSV   #130/150
+    "upper_thresh": 130,#np.array([180,255,140]),  #HSV   #130/150
     "blur_thresh": 100,
     "initial_crop": 100,       #intial size of "screenshot" cropped frame 
     "tracking_frame": 1,            #cropped frame dimensions mulitplier
@@ -27,7 +27,7 @@ CONTROL_PARAMS = {
 CAMERA_PARAMS = {
     "resize_scale": 50, 
     "framerate": 24, 
-    "exposure": 6000,   #6000
+    "exposure": 15000,   #6000
     "Obj": 10,
     "outputname": str(datetime.now())}
 
@@ -39,6 +39,7 @@ STATUS_PARAMS = {
     "acoustic_status": 0,
     "algorithm_status": False,
     "record_status": False,
+    "orientsign": 1
 }
 
 ACOUSTIC_PARAMS = {

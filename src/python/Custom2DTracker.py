@@ -492,11 +492,11 @@ class Tracker:
         Returns:
             None
         """
-        w = frame.shape[0]
-        h = frame.shape[1]
+        w1 = frame.shape[0]
+        h1 = frame.shape[1]
         Bx,By,Bz = MAGNETIC_FIELD_PARAMS["Bx"],MAGNETIC_FIELD_PARAMS["By"],MAGNETIC_FIELD_PARAMS["Bz"]
-        frame, scaling = self.projection.draw_sideview(frame, Bx,By,Bz,MAGNETIC_FIELD_PARAMS["alpha"], MAGNETIC_FIELD_PARAMS["gamma"],w,h )
-        frame, scaling = self.projection.draw_topview(frame, Bx,By,Bz,MAGNETIC_FIELD_PARAMS["alpha"], MAGNETIC_FIELD_PARAMS["gamma"],w,h )
+        frame, scaling = self.projection.draw_sideview(frame, Bx,By,Bz,MAGNETIC_FIELD_PARAMS["alpha"], MAGNETIC_FIELD_PARAMS["gamma"],w1,h1 )
+        frame, scaling = self.projection.draw_topview(frame, Bx,By,Bz,MAGNETIC_FIELD_PARAMS["alpha"], MAGNETIC_FIELD_PARAMS["gamma"],w1,h1 )
         
         linethickness, thickness, fontScale = scaling
         
@@ -555,11 +555,17 @@ class Tracker:
                     # a "velocity" list is in the form of [x, y, magnitude];
                     # get the magnitude of the 10 most recent velocities, find their
                     # average, and display it on the tracker
-                    vmag = [v.mag for v in self.robot_list[bot_id].velocity_list[-self.control_params["memory"]:]]
-                    vmag_avg = round(sum(vmag) / len(vmag),2)
-                    
+                    vmag_avg = round(np.mean([v.mag for v in self.robot_list[bot_id].velocity_list[-self.control_params["memory"]:]]),2)
+                    vx = np.mean([v.x for v in self.robot_list[bot_id].velocity_list[-self.control_params["memory"]:]])
+                    vy = np.mean([v.y for v in self.robot_list[bot_id].velocity_list[-self.control_params["memory"]:]])
                     cv2.putText(frame, f'{vmag_avg:.1f} um/s', (x, y +h + 40), 
-                            cv2.FONT_HERSHEY_SIMPLEX,fontScale=fontScale, thickness=thickness, color=(0,0,255))
+                                cv2.FONT_HERSHEY_SIMPLEX,fontScale=fontScale, thickness=thickness, color=(0,0,255))
+                   
+                    if vmag_avg !=0:
+                        start_point = (int(w1/2.5), 170 + bot_id * 20)
+                        end_point = (int(start_point[0]+40*np.mean(vx)/vmag_avg),int(start_point[1]+40*np.mean(vy)/vmag_avg))
+                        cv2.arrowedLine(frame, start_point, end_point,
+                                          bot_color, thickness=linethickness)  # Draw second vector (white)
                     
                     text = "robot {}: {} um | {} um/s | {} blur".format(bot_id+1,dia,vmag_avg,blur)
                 cv2.putText(

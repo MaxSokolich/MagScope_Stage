@@ -42,9 +42,10 @@ class Roll_Algorithm:
         if len(self.robot_list[-1].trajectory) > 1:
             #logic for arrival condition
             if self.node == len(self.robot_list[-1].trajectory):
-                input1 = 0
-                input2 = 0
-                input3 = 0
+                alpha = 0
+                gamma = 0
+                psi =0
+                freq = 0
                 print("arrived")
 
 

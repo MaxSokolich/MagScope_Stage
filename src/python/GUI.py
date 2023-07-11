@@ -285,7 +285,6 @@ class GUI:
         self.checkboxes_frame.grid(row=6,column=1,rowspan = 2)
 
         savepickle = IntVar(master=master, name="savepickle_var")
-        
         savepickle_box = Checkbutton(
             master=self.checkboxes_frame, 
             name = "savepickle",
@@ -294,11 +293,9 @@ class GUI:
             onvalue=1, 
             offvalue=0
         )
-
         savepickle_box.var = savepickle
 
         cuda_var = IntVar(master=master, name="cuda_var")
-
         cuda_button = Checkbutton(
             master=self.checkboxes_frame,
             name="cuda_checkbox",
@@ -307,13 +304,15 @@ class GUI:
             onvalue=1,
             offvalue=0,
         )
-
         cuda_button.var = cuda_var
+
+        
     
         savepickle_box.grid(row=0, column=0)
         cuda_button.grid(row=1, column=0)
        
 
+        
 
 
 
@@ -442,6 +441,24 @@ class GUI:
         nXfield_label.grid(row=3, column=0)
         self.nXfield_Entry = Entry(master=Bfield_frame, width=5)
         self.nXfield_Entry.grid(row=3, column=1)
+        
+        
+        orientsign_button = Button(
+            self.checkboxes_frame, 
+            text="sign flip", 
+            command=self.orientsign, 
+            height=1, 
+            width=10,
+            bg = 'black',
+            fg= 'white'
+        )
+        orientsign_button.grid(row=2, column=0)
+
+
+    def orientsign(self):
+        STATUS_PARAMS["orientsign"] *=-1
+        self.text_box.insert(END,"sign of Bx = {}\n".format(STATUS_PARAMS["orientsign"]))
+        self.text_box.see("end")
 
         
 
