@@ -33,7 +33,7 @@ from src.python.Custom2DTracker import Tracker
 from src.python.ArduinoHandler import ArduinoHandler
 from src.python.Brightness import Brightness
 from src.python.AnalysisClass import Analysis
-from src.python.PS4_Windows import MyController
+from src.python.PS4_Linux import MyController
 from src.python.Params import CONTROL_PARAMS, CAMERA_PARAMS, STATUS_PARAMS, ACOUSTIC_PARAMS, MAGNETIC_FIELD_PARAMS,PID_PARAMS
 # with jetson orin, cam can get up to 35 fps
 
@@ -585,7 +585,7 @@ class GUI:
             CONTROL_PARAMS["upper_thresh"] = int(upper_thresh_slider.get())
             CONTROL_PARAMS["blur_thresh"] = int(blur_thresh_slider.get())
             CONTROL_PARAMS["initial_crop"] = int(initial_crop_slider.get())
-            CONTROL_PARAMS["tracking_frame"] = int(tracking_frame_slider.get())
+            CONTROL_PARAMS["tracking_frame"] = float(tracking_frame_slider.get())
             CONTROL_PARAMS["memory"] = int(memory_slider.get())
             ACOUSTIC_PARAMS["min_vel"] = float(minvel_slider.get())
             CONTROL_PARAMS["rolling_frequency"] = int(rolling_freq_slider.get())
@@ -661,7 +661,7 @@ class GUI:
             label="tracking frame size",
             from_=1,
             to=5,
-            resolution=1,
+            resolution=.1,
             variable=tracking_frame,
             width=20,
             length=200,

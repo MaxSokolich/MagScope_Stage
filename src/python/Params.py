@@ -46,7 +46,7 @@ ACOUSTIC_PARAMS = {
     "acoustic_freq": 0,
     "acoustic_amplitude": 0,
     "acoustic_resistance":0,
-    "min_vel": 1.9,
+    "min_vel": 3,
 }
 
 

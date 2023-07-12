@@ -11,7 +11,7 @@ from src.python.GUI import GUI
 from src.python.ArduinoHandler import ArduinoHandler
 
 
-PORT = "COM3"#"/dev/ttyACM0" #"/dev/cu.usbmodem11401"#
+PORT = "/dev/ttyACM0" #"/dev/cu.usbmodem11401"#"COM3"#
 
 
 if __name__ == "__main__":

@@ -56,7 +56,7 @@ class Acoustic_Algorithm:
         self.optimal_freq = None
         self.resistance = 0
 
-        self.velocity_max_thresh =  min(ACOUSTIC_PARAMS["min_vel"] *5, 50) #um/s
+        self.velocity_max_thresh =  100#min(ACOUSTIC_PARAMS["min_vel"] *5, 50) #um/s
         
     def reset(self):
 
@@ -111,6 +111,7 @@ class Acoustic_Algorithm:
                             self.increment = int(self.optimal_freq/100)   #decrease increment to accomdate decreased range
                             self.current_freq = self.min_freq  #reset current freq at the new minimum
                         '''
+                        print("optimal is back to none")
                         self.optimal_freq = None
                     
 
@@ -140,6 +141,7 @@ class Acoustic_Algorithm:
                     """
                     self.optimal_freq = self.current_freq  #set the optimal frequency to be used later if vmag dips < vmin
                     AcousticModule.start(self.optimal_freq, self.resistance)
+                    
          
 
                 
@@ -153,6 +155,7 @@ class Acoustic_Algorithm:
                     #self.AcousticMod.start(self.current_freq, self.resistance)
                     AcousticModule.stop()
                     ACOUSTIC_PARAMS["acoustic_freq"] = 0
+                    print("TOO FASTTTTTT")
 
 
                 self.count += 1#increment counter
@@ -230,10 +233,16 @@ class Acoustic_Algorithm:
                         if vd != 0 and bd != 0:
                             costheta = np.dot(vel_bot, self.B_vec) / (vd * bd)
                             sintheta = (vel_bot[0] * self.B_vec[1] - vel_bot[1] * self.B_vec[0]) / (vd * bd)
-                            self.theta = np.arctan2(sintheta,costheta)
-                    
+                            self.theta = np.arccos(costheta)
+                           
+
+                            """self.theta = np.arctan2(sintheta, costheta)   #(np.degrees(np.arccos(costheta)) + 360) % 360
+                            if len(self.theta_maps) > 0:
+                                previous = self.theta_maps[-1]
+                                self.theta = self.theta + np.sign(previous-self.theta)*(2*np.pi)*(np.abs((previous-self.theta))//(2*np.pi*0.8))
+                        """
                         
-                        if not np.isnan(vd):
+                        
                             self.theta_maps = np.append(self.theta_maps,self.theta)
                     
                             if len(self.theta_maps) > 150:
@@ -245,7 +254,7 @@ class Acoustic_Algorithm:
 
                     #OUTPUT SIGNAL      
                     
-                    Bx = self.B_vec[0] / np.sqrt(self.B_vec[0] ** 2 + self.B_vec[1] ** 2)
+                    Bx = STATUS_PARAMS["orientsign"]*self.B_vec[0] / np.sqrt(self.B_vec[0] ** 2 + self.B_vec[1] ** 2)
                     By = self.B_vec[1] / np.sqrt(self.B_vec[0] ** 2 + self.B_vec[1] ** 2)
                     Bz = 0
                     self.alpha = np.arctan2(By, Bx)

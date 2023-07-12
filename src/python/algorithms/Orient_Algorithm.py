@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 import time
 from src.python.ArduinoHandler import ArduinoHandler
+from src.python.Params import CONTROL_PARAMS, CAMERA_PARAMS, STATUS_PARAMS, ACOUSTIC_PARAMS, MAGNETIC_FIELD_PARAMS,PID_PARAMS
 
 class Orient_Algorithm:
     def __init__(self):
@@ -14,6 +15,7 @@ class Orient_Algorithm:
 
         self.B_vec = np.array([1,0])
         self.T_R = 1
+        self.theta = 0
 
 
     def control_trajectory(self, frame: np.ndarray, arduino: ArduinoHandler, robot_list, control_params):
@@ -85,15 +87,11 @@ class Orient_Algorithm:
                     vel_bot = np.array([vx, vy])  # current velocity of self propelled robot
                     vd = np.linalg.norm(vel_bot)
                     bd = np.linalg.norm(self.B_vec)
-
-                    costheta = np.dot(vel_bot, self.B_vec) / (vd * bd)
-                    theta = np.arccos(costheta)
-                    
-                    sintheta = (vel_bot[0] * self.B_vec[1] - vel_bot[1] * self.B_vec[0]) / (vd * bd)
+                    if vd != 0 and bd != 0:
+                        costheta = np.dot(vel_bot, self.B_vec) / (vd * bd)
+                        self.theta = np.arccos(costheta)
                 
-
-                    if not np.isnan(vd):
-                        self.T_R = np.array([[costheta, -sintheta], [sintheta, costheta]])
+                        self.T_R = np.array([[np.cos(self.theta), -np.sin(self.theta)], [np.sin(self.theta), np.cos(self.theta)]])
 
                 self.B_vec = np.dot(self.T_R, direction_vec)
 
@@ -108,6 +106,9 @@ class Orient_Algorithm:
                 input1 = round(Bx,2)
                 input2 = round(By,2)
                 input3 = round(Bz,2)
+                MAGNETIC_FIELD_PARAMS["Bx"] = input1
+                MAGNETIC_FIELD_PARAMS["By"] = input2
+                MAGNETIC_FIELD_PARAMS["Bz"] = input3
                 try:
                     start_arrow = (100, 150 + (self.num_bots - 1) * 20)
                     end_arrow = (
