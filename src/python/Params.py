@@ -39,7 +39,8 @@ STATUS_PARAMS = {
     "acoustic_status": 0,
     "algorithm_status": False,
     "record_status": False,
-    "orientsign": 1
+    "orientsign": 1,
+    "joystick_status": False,
 }
 
 ACOUSTIC_PARAMS = {

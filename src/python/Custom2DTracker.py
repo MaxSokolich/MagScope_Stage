@@ -6,6 +6,7 @@ Module containing the Tracker class
 @authors: Max Sokolich, Brennan Gallamoza, Luke Halko, Trea Holley,
           Alexis Mainiero, Cameron Thacker, Zoe Valladares
 """
+import sys
 import csv
 import pickle
 from src.python.AnalysisClass import Analysis
@@ -422,9 +423,10 @@ class Tracker:
                 self.robot_list[bot].add_time(round(time.time()-self.start,2))
                 self.robot_list[bot].add_acoustic_freq(ACOUSTIC_PARAMS["acoustic_freq"])
                 
-                #should really just be an action command list including acoustic stuff
-                #self.robot_list[bot].add_magnetic_field_params(MAGNETIC_FIELD_PARAMS)  --> this should just be a single list instead of saving it for each bot
-
+                if STATUS_PARAMS["joystick_status"] == True or STATUS_PARAMS["algorithm_status"] == True:
+                    self.robot_list[bot].add_magnetic_field_params(MAGNETIC_FIELD_PARAMS) # this should just be a single list instead of saving it for each bot not very efficent
+               
+                
            
         
 
@@ -668,15 +670,14 @@ class Tracker:
 
         # Continously read and preprocess frames until end of video or error
         # is reached
-
-
+        
         while True:
             fps_counter.update()
             success, frame = cam.read()
             params = {"arduino": arduino, "frame":frame}
             cv2.setMouseCallback("im", self.mouse_points, params)
-
-
+            
+        
 
             self.curr_frame = frame
             if not success or frame is None:
@@ -702,6 +703,7 @@ class Tracker:
             self.frame_num += 1  # increment frame
 
             if self.num_bots > 0:
+                #print(sys.getsizeof(self.robot_list[-1].position_list), " bytes")
                 # DETECT ROBOTS AND UPDATE TRAJECTORY
                 self.detect_robot(frame, fps_counter,self.pix_2metric)
 

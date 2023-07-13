@@ -192,7 +192,7 @@ class Robot:
             "Avg Area": self.avg_area,
             "Trajectory": self.trajectory,
             "Acoustic Frequency": self.acoustic_freq,
-            "Magnetic Field Params": magnetic_field_params
+            "Magnetic Field Params": self.magnetic_field_params
         }
 
         return mydict

@@ -1214,6 +1214,7 @@ class GUI:
         
         if self.joystick is not None:
             self.main_window.after_cancel(self.checkjoy)
+            STATUS_PARAMS["joystick_status"] = False
             
         plt.close()
        
@@ -1251,6 +1252,7 @@ class GUI:
         """
 
         self.joystick = MyController()
+        STATUS_PARAMS["joystick_status"] = True
         self.joystick_process = multiprocessing.Process(target = self.joystick.run, args = (None,self.joystick_q))
         self.joystick_process.start()
         self.checkjoy = self.main_window.after(10, self.CheckJoystickPoll, self.joystick_q)
@@ -1288,6 +1290,8 @@ class GUI:
             MAGNETIC_FIELD_PARAMS["gamma"] = gamma
             MAGNETIC_FIELD_PARAMS["psi"] = psi
             MAGNETIC_FIELD_PARAMS["freq"] = freq
+
+            
             
             self.arduino.send(actions[0], actions[1], actions[2], alpha, gamma, freq, psi )
 
