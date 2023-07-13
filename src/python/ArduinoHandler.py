@@ -49,12 +49,12 @@ class ArduinoHandler:
             actions = [Bx, By, Bz, alpha, gamma, freq]
 
         """
+        data = [float(Bx), float(By), float(Bz), float(alpha), float(gamma), float(freq),float(psi)]
         if self.conn is None:
-            print("Connection not initialized, message not sent")
+            print("Connection not initialized...", data)
             #pass
         else:
             #Bx = round(Bx,3)
-            data = [float(Bx), float(By), float(Bz), float(alpha), float(gamma), float(freq),float(psi)]
             message = self.conn.tx_obj(data)
             self.conn.send(message)
             print("Data sent:", data)

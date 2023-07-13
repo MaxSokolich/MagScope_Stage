@@ -115,23 +115,6 @@ class Tracker:
             # CoilOn = False
             bot_loc = [x, y]
 
-            #create upper and lower bounds from point click color
-            #pixel_color = cv2.cvtColor(params["frame"],cv2.COLOR_BGR2HSV)[y,x]
-            #self.textbox.insert(END,"pixel color: {}\n".format(pixel_color))
-            #self.textbox.see("end")
-            
-            #print([x,y])
-            '''
-            hl = max(min(h_-20,180),0)
-            sl = max(min(s_-50,255),0)
-            vl = max(min(v_-50,255),0)
-            hu = max(min(h_+20,180),0)
-            su = max(min(s_+50,255),0)
-            vu = max(min(v_+50,255),0)
-            self.control_params["lower_thresh"] = np.array([hl,sl,vl])
-            self.control_params["upper_thresh"] = np.array([hu,su,vu])
-            print(self.control_params["lower_thresh"],self.control_params["upper_thresh"])'''
-
             #generate original bounding box
             x_1 = int(x - self.control_params["initial_crop"] / 2)
             y_1 = int(y - self.control_params["initial_crop"] / 2)
@@ -342,6 +325,16 @@ class Tracker:
             - from contours draw a bounding box around the contours
             - find the centroid of the bounding box and use this as the robots current position
 
+        Calculate and display circular marker for a bot's position. Uses the bot's positional data,
+        average area, cropped frames, and maximum dimensions of its contours to make calculations.
+
+        If contours were found from the previous step, calculate the area of the contours and
+        append it to the Robot class. Then, update global average running list of areas.
+
+        Based on the current position calculate above, adjust cropped area dimensions for
+        next frame, and finally update Robot class with new cropped dimension, position,
+        velocity, and area.
+
         Args:
             frame: np array representation of the current video frame read in
         Returns:
@@ -385,21 +378,54 @@ class Tracker:
                     max_height = h*self.control_params["tracking_frame"]
                 #cv2.rectangle(cropped_frame, (x, y), (x + w, y + h), (255, 0, 0), 1)
                 cv2.drawContours(cropped_frame, [max_cnt], -1, (0, 255, 255), 1)
+                
+                #add robot params to class
+                
+                # update cropped region based off new position and average area
 
+       
+          
+                x_1_new = x_1 + current_pos[0] - max_width
+                y_1_new = y_1 + current_pos[1] - max_height
+                x_2_new = 2* max_width
+                y_2_new = 2* max_height
+                new_crop = [int(x_1_new), int(y_1_new), int(x_2_new), int(y_2_new)]
                 
-                #print(ch,cs,cv)
+                # calculate velocity based on last position and self.fps
+                #print(pix_2metric)
+                if len(self.robot_list[bot].position_list) > 5:
+                    velx = (
+                        (current_pos[0] + x_1 - self.robot_list[bot].position_list[-5][0])
+                        * (fps.get_fps()/5)/ (pix_2metric)
+                    )
+
+                    vely = (
+                        (current_pos[1] + y_1 - self.robot_list[bot].position_list[-5][1])
+                        * (fps.get_fps()/5) / (pix_2metric)
+                        
+                    )
+
+                    velz = 0
+                    if len(self.robot_list[bot].blur_list) > 0:
+                        velz = (self.robot_list[bot].blur_list[-1] - blur)    #This needs to be scaled or something (takes the past 5th blur value to get a rate)
+
+                    vel = Velocity(velx, vely, 0)
+                    self.robot_list[bot].add_velocity(vel)
                 
-                self.track_robot_position(
-                    area,
-                    self.robot_list[bot],
-                    cropped_frame,
-                    (x_1, y_1),
-                    current_pos,
-                    blur,
-                    (max_width, max_height),
-                    fps,
-                    pix_2metric
-                )
+                # update robots params
+                self.robot_list[bot].add_area(area)
+                self.robot_list[bot].set_avg_area(np.mean(self.robot_list[bot].area_list))
+                self.robot_list[bot].add_crop(new_crop)
+                self.robot_list[bot].add_position([current_pos[0] + x_1, current_pos[1] + y_1])
+                self.robot_list[bot].add_blur(blur)
+                self.robot_list[bot].add_frame(self.frame_num)
+                self.robot_list[bot].add_time(round(time.time()-self.start,2))
+                self.robot_list[bot].add_acoustic_freq(ACOUSTIC_PARAMS["acoustic_freq"])
+                
+                #should really just be an action command list including acoustic stuff
+                #self.robot_list[bot].add_magnetic_field_params(MAGNETIC_FIELD_PARAMS)  --> this should just be a single list instead of saving it for each bot
+
+           
         
 
 

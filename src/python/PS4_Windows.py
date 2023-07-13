@@ -1,6 +1,6 @@
-import cv2
+import os
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import pygame
-import time
 import numpy as np
 from scipy import interpolate
 

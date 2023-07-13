@@ -277,14 +277,7 @@ class Acoustic_Algorithm:
                     except:
                         pass
                 
-                    robot_list[-1].add_track(
-                        error,
-                        [robotx, roboty],
-                        [targetx, targety],
-                        self.alpha,
-                        ACOUSTIC_PARAMS["acoustic_freq"],
-                        time.time()-self.start,
-                        )
+              
 
         else:
             self.Bx, self.By, self.Bz = 0,0,0

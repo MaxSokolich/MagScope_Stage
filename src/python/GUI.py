@@ -26,6 +26,7 @@ from typing import Union
 from tkinter import *
 from tkinter import Tk
 from tkinter import filedialog
+import platform
 
 from src.python.AcousticClass import AcousticClass
 from src.python.HallEffect import HallEffect
@@ -35,7 +36,14 @@ from src.python.Brightness import Brightness
 from src.python.AnalysisClass import Analysis
 from src.python.PS4_Linux import MyController
 from src.python.Params import CONTROL_PARAMS, CAMERA_PARAMS, STATUS_PARAMS, ACOUSTIC_PARAMS, MAGNETIC_FIELD_PARAMS,PID_PARAMS
-# with jetson orin, cam can get up to 35 fps
+
+if "mac" in platform.platform():
+    from src.python.PS4_Mac import MyController
+elif "linux" in platform.platform():
+    from src.python.PS4_Linux import MyController
+elif "windows" in platform.platform():
+    from src.python.PS4_Windows import MyController
+
 
 
 

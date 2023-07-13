@@ -8,7 +8,6 @@ Module containing the Robot class
 """
 
 from typing import List, Tuple, Union
-import numpy as np
 from src.python.Velocity import Velocity
 from src.python.Position import Position
 
@@ -34,6 +33,7 @@ class Robot:
         self.trajectory = []  # track points from manual pathing
         self.times = []  #time step per frame in seconds
         self.acoustic_freq = []#acoustic frequency applied
+        self.magnetic_field_params = [] #magnetic field params applied at that instant
 
 
     def add_area(self, area: float):
@@ -147,42 +147,31 @@ class Robot:
         """
         self.acoustic_freq.append(freq)
 
-  
-
-    def add_track(
-        self,
-        error: float,
-        actual_tracks: List[int],
-        desired_tracks: List[int],
-        alpha: float,
-        freq:float,
-        time: float,
-        
-    ):
+    def add_time(self, time):
         """
-        Adds current frame's track information to the bot's tracks list
+        Add current time 
 
         Args:
-            frame:  current number frame to be added
-            error:  euclidean distance between the microbot's position and
-                    the intended position
-            actual_tracks:  list of true [x,y] coords
-            desired_tracks: list of intended [x,y] coords
-            alpha:  alpha parameter
-            time:   current time as of track addition
-            control_param:  TBD
+            time:    time.time()
 
         Returns:
             None
         """
-        self.tracks.append(
-            [error, actual_tracks, desired_tracks, alpha,freq, time]
-        )
-
-    def add_time(self, time):
         self.times.append(time)
+    
+    def add_magnetic_field_params(self,actions): #I cant remember if this cannot be a dictionary or something
+        """
+        Add current magnetic field values being applied
 
-    def as_dict(self) -> dict:
+        Args:
+            actions: [Bx, By, Bz, alpha, gamma, freq, psi]
+
+        Returns:
+            None
+        """
+        self.magnetic_field_params.append(actions)
+
+    def as_dict(self,magnetic_field_params) -> dict:
         """
         Convert's the bot's current frame and position information into a
         readable dictionary
@@ -193,33 +182,17 @@ class Robot:
         Returns:
             dictionary of the bot's current position and frame information
         """
-        pos_x = np.array(self.position_list)[:, 0]
-        pos_y = np.array(self.position_list)[:, 1]
-        vel_x = np.array([v.x for v in self.velocity_list])
-        vel_y = np.array([v.y for v in self.velocity_list])
-        vel_z = np.array([v.z for v in self.velocity_list])
-        v_mag = np.array([v.mag for v in self.velocity_list])
-        if len(self.trajectory) > 1:
-            traj_x = np.array(self.trajectory)[:, 0]
-            traj_y = np.array(self.trajectory)[:, 1]
-        else:
-            traj_x,traj_y = None,None
         mydict = {
             "Frame": self.frame_list,
             "Times": self.times,
-            "PositionX": pos_x,
-            "PositionY": pos_y,
-            "VelX": vel_x,
-            "VelY": vel_y,
-            "VelZ": vel_z,
-            "VMag": v_mag,
+            "Position": self.position_list,
+            "Velocity": self.velocity_list,
             "Area": self.area_list,
             "Cropped Frame Dim": self.cropped_frame,
             "Avg Area": self.avg_area,
-            "Track_Params(frame,error,current_pos,target_pos,alpha,freq,time)": self.tracks,
-            "TrajectoryX": traj_x,
-            "TrajectoryY": traj_y,
+            "Trajectory": self.trajectory,
             "Acoustic Frequency": self.acoustic_freq,
+            "Magnetic Field Params": magnetic_field_params
         }
 
         return mydict

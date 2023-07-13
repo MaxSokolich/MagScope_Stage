@@ -90,16 +90,7 @@ class Roll_Algorithm:
                 MAGNETIC_FIELD_PARAMS["psi"] = psi
                 MAGNETIC_FIELD_PARAMS["freq"] = freq
                 
-        
-            
-                self.robot_list[-1].add_track(
-                error,
-                [robotx, roboty],
-                [targetx, targety],
-                alpha,
-                self.control_params["rolling_frequency"],
-                time.time()-self.start,
-                )
+                
 
             
             arduino.send(0,0,0, alpha, gamma, freq, psi)

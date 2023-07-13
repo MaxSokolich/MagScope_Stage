@@ -154,14 +154,8 @@ class Orient_Algorithm:
                 except:
                     pass
                 
-                self.robot_list[-1].add_track(
-                error,
-                [robotx, roboty],
-                [targetx, targety],
-                self.alpha,
-                self.control_params["rolling_frequency"],
-                time.time()-self.start,
-            )
+    
+          
             #arduino.send(typ,input1,input2,input3)
             arduino.send(input1,input2,input3,0,0,0,0)
 
