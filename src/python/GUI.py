@@ -99,35 +99,8 @@ class GUI:
 
 
         # Tkinter widget attributes
-        self.text_box = Text(master, width=22, height=4)
-        self.scroll_bar = Scrollbar(
-            master, 
-            command=self.text_box.yview, 
-            orient="vertical"
-        )
-        self.text_box.configure(yscrollcommand=self.scroll_bar.set)
-        self.text_box.grid(row=7, column=2, columnspan =2,sticky="nwse")
 
 
-        coil_joystick_button = Button(
-            master, 
-            text="Joystick On", 
-            command=self.joy_proc, 
-            height=1, 
-            width=18,
-            bg = 'magenta',
-            fg= 'white'
-        )
-
-        sensor_button = Button(
-            master, 
-            text="Sensor On", 
-            command=self.sensor_proc, 
-            height=1, 
-            width=18,
-            bg = 'black',
-            fg= 'white'
-        )
 
         closed_loop_params_button = Button(
             master,
@@ -164,7 +137,7 @@ class GUI:
             text="Edit PID Params",
             command=self.edit_pid_params,
             height=1,
-            width=18,
+            width=20,
             bg = 'black',
             fg= 'white'
         )
@@ -172,12 +145,135 @@ class GUI:
         closed_loop_params_button.grid(row=0, column=0)
         cam_params_button.grid(row=1, column=0)
         acoustic_params_button.grid(row=2, column=0)
-        pid_params_button.grid(row=2,column=3)
+        pid_params_button.grid(row=3,column=0)
+
+
+
+         #BFIELD FRAME
+        Bfield_frame = Frame(master = master)
+        Bfield_frame.grid(row=4,column=0,rowspan = 4)
+
+        Yfield_label = Label(master=Bfield_frame, text="Y", width=10)
+        Yfield_label.grid(row=0, column=0)
+        self.Yfield_Entry = Entry(master=Bfield_frame, width=5)
+        self.Yfield_Entry.grid(row=0, column=1)
+        
+        Xfield_label = Label(master=Bfield_frame, text="X", width=10)
+        Xfield_label.grid(row=1, column=0)
+        self.Xfield_Entry = Entry(master=Bfield_frame, width=5)
+        self.Xfield_Entry.grid(row=1, column=1)
+
+        nYfield_label = Label(master=Bfield_frame, text="-Y", width=10)
+        nYfield_label.grid(row=2, column=0)
+        self.nYfield_Entry = Entry(master=Bfield_frame, width=5)
+        self.nYfield_Entry.grid(row=2, column=1)
+
+        nXfield_label = Label(master=Bfield_frame, text="-X", width=10)
+        nXfield_label.grid(row=3, column=0)
+        self.nXfield_Entry = Entry(master=Bfield_frame, width=5)
+        self.nXfield_Entry.grid(row=3, column=1)
+
+        close_button = Button(master, 
+            text="Exit", 
+            width=10, 
+            height=4, 
+            command=self.exit, 
+            bg = 'black',
+            fg= 'white')
+        close_button.grid(row=8, column=0)
+        
+
+         #5 BIG BUTTONS
+
+        self.Big_button_frame = Frame(master = master)
+        self.Big_button_frame.grid(row=0,column=1,rowspan = 4)
+
+        status_button = Button(
+            self.Big_button_frame, 
+            text="Stop:\nZero All Signals", 
+            command=self.status, 
+            height=4, 
+            width=20,
+            bg = 'red',
+            fg= 'white'
+        )
+
+        track_button = Button(
+            self.Big_button_frame, 
+            text="Track", 
+            command=self.track, 
+            height=4, 
+            width=10,
+            bg = 'blue',
+            fg= 'white'
+        )
+
+        status_button.grid(row=0, column=0)
+        track_button.grid(row=1, column=0)
+
+
+        #3 CHECKBOXES FRAME
+        self.checkboxes_frame = Frame(master = master)
+        self.checkboxes_frame.grid(row=4,column=1,rowspan = 4)
+
+        vid_name = Button(
+            master= self.checkboxes_frame,
+            name="vid_name",
+            text="Choose Video",
+            command=self.upload_vid,
+            height=1,
+            width=10,
+            bg = 'red',
+            fg= 'black'
+        )
+
+        live_var = IntVar(master=master, name="live_var")
+        livecam_button = Checkbutton(
+            master = self.checkboxes_frame,
+            name="live_checkbox",
+            text="Live Cam for \nTracking?",
+            variable=live_var,
+            onvalue=1,
+            offvalue=0,
+        )
+        livecam_button.var = live_var
+    
+        
+
+       
+
+        cuda_var = IntVar(master=master, name="cuda_var")
+        cuda_button = Checkbutton(
+            master=self.checkboxes_frame,
+            name="cuda_checkbox",
+            text="Use CUDA?",
+            variable=cuda_var,
+            onvalue=1,
+            offvalue=0,
+        )
+        cuda_button.var = cuda_var
+
+        vid_name.grid(row=0, column=0)
+        livecam_button.grid(row=1, column=0)
+        cuda_button.grid(row=2, column=0)
+
+        orientsign_button = Button(
+            self.checkboxes_frame, 
+            text="sign flip", 
+            command=self.orientsign, 
+            height=1, 
+            width=5,
+            bg = 'black',
+            fg= 'white'
+        )
+        orientsign_button.grid(row=3, column=0)
+
+
 
 
         #VIDEO RECORD FRAME
         self.video_record_frame = Frame(master = master)
-        self.video_record_frame.grid(row=3,column=3,rowspan = 2)
+        self.video_record_frame.grid(row=8,column=1,rowspan = 2)
 
 
         output_name = Entry(master=self.video_record_frame, name="output_name")
@@ -207,12 +303,21 @@ class GUI:
         output_name.grid(row=1, column=0)
         record_button.grid(row=2, column=0)
         stop_record_button.grid(row=3, column=0)
+
+
+
+
+
+
+
         
+
+
 
         
         #2 ALGORITHM FRAME
         self.algorithm_frame = Frame(master = master)
-        self.algorithm_frame.grid(row=0,column=2,rowspan = 3)
+        self.algorithm_frame.grid(row=0,column=2,rowspan = 5)
         
         Label(master = self.algorithm_frame, text="--Algorithm List--").grid(row=0, column=0)
 
@@ -264,8 +369,6 @@ class GUI:
         )
         AlgoPID_box.var = AlgoPID
 
-############################################################################
-#acoustic checkbox
         AlgoAcoustic = IntVar(master=master, name="acoustic")
         AlgoAcoustic_box = Checkbutton(
             master=self.algorithm_frame, 
@@ -278,60 +381,8 @@ class GUI:
         )
         AlgoAcoustic_box.var = AlgoAcoustic
 
-
-        AlgoRoll_box.grid(row=1, column=0)
-        AlgoOrient_box.grid(row=2, column=0)
-        AlgoMulti_box.grid(row=3, column=0)
-        AlgoPID_box.grid(row=4, column=0)
-        AlgoAcoustic_box.grid(row=5, column=0)
-
-
-
-
-        #3 CHECKBOXES FRAME
-        self.checkboxes_frame = Frame(master = master)
-        self.checkboxes_frame.grid(row=6,column=1,rowspan = 2)
-
-        savepickle = IntVar(master=master, name="savepickle_var")
-        savepickle_box = Checkbutton(
-            master=self.checkboxes_frame, 
-            name = "savepickle",
-            text="Save Pickle File", 
-            variable=savepickle, 
-            onvalue=1, 
-            offvalue=0
-        )
-        savepickle_box.var = savepickle
-
-        cuda_var = IntVar(master=master, name="cuda_var")
-        cuda_button = Checkbutton(
-            master=self.checkboxes_frame,
-            name="cuda_checkbox",
-            text="Use CUDA?",
-            variable=cuda_var,
-            onvalue=1,
-            offvalue=0,
-        )
-        cuda_button.var = cuda_var
-
-        
-    
-        savepickle_box.grid(row=0, column=0)
-        cuda_button.grid(row=1, column=0)
-       
-
-        
-
-
-
-        
-        #4 CHOOSE VIDEO FRAME
-        self.video_option_frame = Frame(master = master)
-        self.video_option_frame.grid(row=3,column=2,rowspan = 2)
-
-
         run_algo_button = Button(
-            self.video_option_frame,
+            self.algorithm_frame,
             text="Run Algo", 
             command=self.run_algo, 
             height=1, 
@@ -339,85 +390,70 @@ class GUI:
             bg = 'yellow',
             fg= 'black'
         )
+
+
+        AlgoRoll_box.grid(row=1, column=0)
+        AlgoOrient_box.grid(row=2, column=0)
+        AlgoMulti_box.grid(row=3, column=0)
+        AlgoPID_box.grid(row=4, column=0)
+        AlgoAcoustic_box.grid(row=5, column=0)
+        run_algo_button.grid(row=6, column=0)
+
+        
+
+    
+
+        savepickle = IntVar(master=master, name="savepickle_var")
+        savepickle_box = Checkbutton(
+            master=self.main_window, 
+            name = "savepickle",
+            text="Save Pickle File", 
+            variable=savepickle, 
+            onvalue=1, 
+            offvalue=0
+        )
+        savepickle_box.var = savepickle
+        savepickle_box.grid(row=5, column=2)
        
 
-        vid_name = Button(
-            self.video_option_frame,
-            name="vid_name",
-            text="Choose Video",
-            command=self.upload_vid,
-            height=1,
-            width=10,
-            bg = 'red',
-            fg= 'black'
-        )
         
-        live_var = IntVar(master=master, name="live_var")
 
-        livecam_button = Checkbutton(
-            self.video_option_frame,
-            name="live_checkbox",
-            text="Use Live Cam for \nTracking?",
-            variable=live_var,
-            onvalue=1,
-            offvalue=0,
-        )
-        livecam_button.var = live_var
-
-        run_algo_button.grid(row=0, column=0)
-        vid_name.grid(row=1, column=0)
-        livecam_button.grid(row=2, column=0)
-
-
-
-        #5 BIG BUTTONS
-
-        Big_button_frame = Frame(master = master)
-        Big_button_frame.grid(row=0,column=1,rowspan = 7)
-
-        status_button = Button(
-            Big_button_frame, 
-            text="Stop:\nZero All Signals", 
-            command=self.status, 
-            height=5, 
-            width=20,
-            bg = 'red',
+        #under algo list stuff
+        coil_joystick_button = Button(
+            master, 
+            text="Joystick On", 
+            command=self.joy_proc, 
+            height=1, 
+            width=18,
+            bg = 'magenta',
             fg= 'white'
         )
 
-        track_button = Button(
-            Big_button_frame, 
-            text="Track", 
-            command=self.track, 
-            height=4, 
-            width=20,
-            bg = 'blue',
-            fg= 'white'
-        )
-
-  
-
-        close_button = Button(master, 
-            text="Exit", 
-            width=10, 
-            height=4, 
-            command=self.exit, 
+        sensor_button = Button(
+            master, 
+            text="Sensor On", 
+            command=self.sensor_proc, 
+            height=1, 
+            width=18,
             bg = 'black',
-            fg= 'white')
+            fg= 'white'
+        )
 
-        status_button.grid(row=0, column=1,rowspan =3)
-        track_button.grid(row=3, column=1,rowspan=2)
         
+        coil_joystick_button.grid(row=6, column=2)
+        sensor_button.grid(row=7, column=2)
 
-        close_button.grid(row=7, column=0)
+        self.text_box = Text(master, width=22, height=4)
+        self.scroll_bar = Scrollbar(
+            master, 
+            command=self.text_box.yview, 
+            orient="vertical"
+        )
+        self.text_box.configure(yscrollcommand=self.scroll_bar.set)
+        self.text_box.grid(row=8, column=2, columnspan =2,sticky="nwse")
 
-        #6 GUI MAINFRAME: OTHER
+         #6 GUI MAINFRAME: OTHER
         Label(master, text="---Robot List---").grid(row=0, column=4)
-        
-
-        
-        coil_joystick_button.grid(row=0, column=3,rowspan =1)
-        sensor_button.grid(row=1, column=3,rowspan =1)
         
         
         
@@ -426,41 +462,9 @@ class GUI:
         
 
     
-        #BFIELD FRAME
-        Bfield_frame = Frame(master = master)
-        Bfield_frame.grid(row=3,column=0,rowspan = 2)
-
-        Yfield_label = Label(master=Bfield_frame, text="Y", width=10)
-        Yfield_label.grid(row=0, column=0)
-        self.Yfield_Entry = Entry(master=Bfield_frame, width=5)
-        self.Yfield_Entry.grid(row=0, column=1)
+       
         
-        Xfield_label = Label(master=Bfield_frame, text="X", width=10)
-        Xfield_label.grid(row=1, column=0)
-        self.Xfield_Entry = Entry(master=Bfield_frame, width=5)
-        self.Xfield_Entry.grid(row=1, column=1)
 
-        nYfield_label = Label(master=Bfield_frame, text="-Y", width=10)
-        nYfield_label.grid(row=2, column=0)
-        self.nYfield_Entry = Entry(master=Bfield_frame, width=5)
-        self.nYfield_Entry.grid(row=2, column=1)
-
-        nXfield_label = Label(master=Bfield_frame, text="-X", width=10)
-        nXfield_label.grid(row=3, column=0)
-        self.nXfield_Entry = Entry(master=Bfield_frame, width=5)
-        self.nXfield_Entry.grid(row=3, column=1)
-        
-        
-        orientsign_button = Button(
-            self.checkboxes_frame, 
-            text="sign flip", 
-            command=self.orientsign, 
-            height=1, 
-            width=10,
-            bg = 'black',
-            fg= 'white'
-        )
-        orientsign_button.grid(row=2, column=0)
 
 
     def orientsign(self):
@@ -1162,18 +1166,18 @@ class GUI:
         )
         #self.tracker = tracker
 
-        if (self.get_widget(self.video_option_frame, "live_checkbox").var.get()):
+        if (self.get_widget(self.checkboxes_frame, "live_checkbox").var.get()):
             video_name = None
         else:
             video_name = self.external_file
 
         
-        robot_list, magnetic_field_params = tracker.main(video_name, self.arduino, self.AcousticModule)
+        robot_list = tracker.main(video_name, self.arduino, self.AcousticModule)
 
-        if self.get_widget(self.checkboxes_frame, "savepickle").var.get():
+        if self.get_widget(self.main_window, "savepickle").var.get():
             if len(robot_list) > 0:
                 output_name = str(self.get_widget(self.video_record_frame, "output_name").get())
-                analyze = Analysis(CONTROL_PARAMS, CAMERA_PARAMS,STATUS_PARAMS,robot_list,magnetic_field_params)
+                analyze = Analysis(CONTROL_PARAMS, CAMERA_PARAMS,STATUS_PARAMS,robot_list)
                 analyze.convert2pickle(output_name)
                 #analyze.plot()
 
@@ -1237,9 +1241,6 @@ class GUI:
         except KeyError:
             raise KeyError(f"Cannot find widget named {widget_name}")
 
-
-
-    
 
     def joy_proc(self):
         """

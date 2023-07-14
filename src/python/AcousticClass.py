@@ -18,7 +18,6 @@ try:
                 None
             '''
             
-    
             ##DEFINE DIGITAL POTENTIAMETER PINS
             self.dpCS = 11 #11
             self.dpUD = 13  #13

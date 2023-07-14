@@ -7,7 +7,6 @@ from src.python.ArduinoHandler import ArduinoHandler
 from src.python.AcousticClass import AcousticClass
 from src.python.algorithms.Roll_Algorithm import Roll_Algorithm
 from src.python.algorithms.Orient_Algorithm_V2 import Orient_Algorithm
-
 from src.python.algorithms.PID_code_forMax import PID_Algorithm
 from src.python.algorithms.MultiAgent_Algorithm import Multi_Agent_Algorithm
 from src.python.algorithms.Orient_Bubble import PI_Algorithm
@@ -17,6 +16,8 @@ class AlgorithmHandler:
     """
     Algorithm class for handleing new algorithms. You can import an algorithm from the 
     algorithm folder or create a new one.
+
+    only 5 will be displayed on the gui at a time but you can sub certain ones out
     """
 
     def __init__(self):
@@ -41,7 +42,7 @@ class AlgorithmHandler:
         if status_params["rolling_status"] == 1:
             self.Roll_Robot.control_trajectory(frame, arduino, robot_list, control_params)
         
-        elif status_params["PID_status"] == 1:  #yanda is using
+        elif status_params["PID_status"] == 1:  
             self.PID_Robot.control_trajectory(frame, arduino, robot_list, control_params)
         
         elif status_params["orient_status"] == 1:

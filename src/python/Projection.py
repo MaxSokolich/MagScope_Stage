@@ -3,6 +3,10 @@ import cv2
 import math
 
 class AxisProjection:
+    """
+    class for displaying a 3D axis projection on the 2D window,
+    displays both rotating field direction and uniform field direction depending on which is being applied
+    """
 
     def projection(self, window, Bx,By,Bz,alpha, gamma, pitch, yaw, roll, w, h, offsetx, offsety,title):
         
@@ -82,6 +86,9 @@ class AxisProjection:
         offsetx, offsety = int((window_width/2)*(9.5/10)) , -int((window_height/2)*(7.4/10))#pixel offset from center 
         window, scaling = self.projection(window,Bx,By,Bz,alpha,gamma,pitch,yaw,roll,window_width, window_height, offsetx,offsety, title)
         return window,scaling
+
+
+
 """
 if __name__ == "__main__":
     window_width  = 480

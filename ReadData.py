@@ -1,33 +1,17 @@
 import pandas as pd
 
 data = pd.read_pickle("/Users/bizzarohd/Desktop/MagScope_Stage/src/data/test.pickle")
-robotlist = data[0]
-magneticfield = data[1]
 
+#iteratives
+frames = data["Frame"]
+times = data["Times"]
 
-"""
-MAGNETIC_FIELD_PARAMS = {
-    "Bx": 0,
-    "By": 0,
-    "Bz": 0,
-    "alpha": 0,
-    "gamma": 90,
-    "rolling_frequency": 10,
-    "psi": 90,
-   
-}
+#inputs: 
+positions = data["Position"]
+velocities = data["Velocity"]
+areas = data["Area"]
+trajectory = data["Trajectory"]
 
-
-robotlist[i] = {
-            "Frame": self.frame_list,
-            "Times": self.times,
-            "Position": self.position_list,
-            "Velocity": self.velocity_list,
-            "Area": self.area_list,
-            "Cropped Frame Dim": self.cropped_frame,
-            "Avg Area": self.avg_area,
-            "Trajectory": self.trajectory,
-            "Acoustic Frequency": self.acoustic_freq,
- 
-        }
-"""
+#outputs
+acoustic_freq = data["Acoustic Frequency"]
+magnetic_field = data["Magnetic Field"]

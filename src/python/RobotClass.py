@@ -11,7 +11,6 @@ from typing import List, Tuple, Union
 from src.python.Velocity import Velocity
 from src.python.Position import Position
 
-
 class Robot:
     """
     Robot class to store and ID all new robots currently being tracked.
@@ -33,6 +32,7 @@ class Robot:
         self.trajectory = []  # track points from manual pathing
         self.times = []  #time step per frame in seconds
         self.acoustic_freq = []#acoustic frequency applied
+        self.magnetic_field = [] #magnetif field params being sent to arduino
 
 
     def add_area(self, area: float):
@@ -158,6 +158,18 @@ class Robot:
         """
         self.times.append(time)
     
+    def add_magnetic_field(self, magnetic_field):
+        """
+        Add current magnetic field params
+
+        Args:
+            magnetif field
+
+        Returns:
+            None
+        """
+        self.magnetic_field.append(magnetic_field)
+    
 
     def as_dict(self) -> dict:
         """
@@ -180,6 +192,7 @@ class Robot:
             "Avg Area": self.avg_area,
             "Trajectory": self.trajectory,
             "Acoustic Frequency": self.acoustic_freq,
+            "Magnetic Field": self.magnetic_field,
  
         }
 

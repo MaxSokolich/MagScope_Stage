@@ -90,8 +90,7 @@ class Tracker:
         self.robot_var_list = []
         self.robot_checklist_list = []
 
-        #create an array to store the current magnetic field params
-        self.magnetic_field_params = []
+
 
     
 
@@ -139,10 +138,7 @@ class Tracker:
             #create robot checkbox in gui
             self.create_robot_checkbox(self.robot_window)
 
-            
-
-            
-
+        
         # Right mouse click event; allows you to draw the trajectory of the
         # most currently added microbot, so long as the button is held
         elif event == cv2.EVENT_RBUTTONDOWN:
@@ -175,14 +171,14 @@ class Tracker:
             del self.robot_checklist_list[:]
             del self.robot_var_list[:]
             del self.robot_list[:]
-            del self.magnetic_field_params[:] #if we reset the robots, we also want to reset the magnetic_field_params list
+
 
             if params["arduino"].conn is not None:
                 params["arduino"].send(0, 0, 0, 0, 0, 0, 0)
 
             #reset robot checkboxes
             self.robot_window = Frame(master= self.main_window)#Toplevel(self.main_window)
-            self.robot_window.grid(row=1,column=4, rowspan=7)
+            self.robot_window.grid(row=0,column=0, rowspan=8)
 
             #stop Acoustic Class if its on
             self.Acoustic_Class.stop()
@@ -284,10 +280,8 @@ class Tracker:
          
         
             cropped_frame = frame[y_1 : y_1 + y_2, x_1 : x_1 + x_2]
-            
             contours, blur = self.cp.get_contours(cropped_frame, self.control_params)
             
-    
             if len(contours) !=0:
                
                 max_cnt = contours[0]
@@ -313,9 +307,6 @@ class Tracker:
                 #add robot params to class
                 
                 # update cropped region based off new position and average area
-
-       
-          
                 x_1_new = x_1 + current_pos[0] - max_width
                 y_1_new = y_1 + current_pos[1] - max_height
                 x_2_new = 2* max_width
@@ -352,13 +343,12 @@ class Tracker:
                 self.robot_list[bot].add_frame(self.frame_num)
                 self.robot_list[bot].add_time(round(time.time()-self.start,2))
                 self.robot_list[bot].add_acoustic_freq(ACOUSTIC_PARAMS["acoustic_freq"])
+                if STATUS_PARAMS["joystick_status"] == True or STATUS_PARAMS["algorithm_status"] == True:  #if we start acuated the bots, record the action commands
+                    current_field_params = MAGNETIC_FIELD_PARAMS.copy()
+                    self.robot_list[bot].add_magnetic_field(current_field_params)
                 
                
                
-                
-           
-        
-
 
     def get_fps(self, fps: FPSCounter, frame: np.ndarray, scaling):
         """
@@ -634,9 +624,6 @@ class Tracker:
             self.frame_num += 1  # increment frame
 
             if self.num_bots > 0:
-                if STATUS_PARAMS["joystick_status"] == True or STATUS_PARAMS["algorithm_status"] == True:  #if we start acuated the bots, record the action commands
-                    current_field_params = MAGNETIC_FIELD_PARAMS.copy()
-                    self.magnetic_field_params.append([self.frame_num, current_field_params])
             
                 #print(sys.getsizeof(self.robot_list[-1].position_list), " bytes")
                 # DETECT ROBOTS AND UPDATE TRAJECTORY
@@ -698,7 +685,7 @@ class Tracker:
                 self.textbox.see("end")
 
                 if len(self.robot_list) > 0:
-                    analyze = Analysis(self.control_params, self.camera_params,self.status_params,self.robot_list, self.magnetic_field_params)
+                    analyze = Analysis(self.control_params, self.camera_params,self.status_params,self.robot_list)
                     analyze.convert2pickle(output_name)
                
 
@@ -728,7 +715,7 @@ class Tracker:
         if result is not None:
             result.release()
             if len(self.robot_list) > 0:
-                analyze = Analysis(self.control_params, self.camera_params,self.status_params,self.robot_list,self.magnetic_field_params)
+                analyze = Analysis(self.control_params, self.camera_params,self.status_params,self.robot_list)
                 analyze.convert2pickle(output_name)
         
 
@@ -740,7 +727,7 @@ class Tracker:
         del self.robot_checklist_list[:]
         del self.robot_var_list[:]
 
-        return self.robot_list, self.magnetic_field_params
+        return self.robot_list
             
       
        
