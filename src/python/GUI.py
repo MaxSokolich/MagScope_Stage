@@ -596,10 +596,10 @@ class GUI:
             CONTROL_PARAMS["tracking_frame"] = float(tracking_frame_slider.get())
             CONTROL_PARAMS["memory"] = int(memory_slider.get())
             ACOUSTIC_PARAMS["min_vel"] = float(minvel_slider.get())
-            CONTROL_PARAMS["rolling_frequency"] = int(rolling_freq_slider.get())
+            MAGNETIC_FIELD_PARAMS["rolling_frequency"] = int(rolling_freq_slider.get())
             CONTROL_PARAMS["arrival_thresh"] = int(arrival_thresh_slider.get())
-            CONTROL_PARAMS["gamma"] = int(gamma_slider.get())
-            CONTROL_PARAMS["psi"] = int(psi_slider.get())
+            MAGNETIC_FIELD_PARAMS["gamma"] = int(gamma_slider.get())
+            MAGNETIC_FIELD_PARAMS["psi"] = int(psi_slider.get())
 
             self.main_window.update()
 
@@ -759,10 +759,10 @@ class GUI:
         tracking_frame_slider.set(CONTROL_PARAMS["tracking_frame"])
         memory_slider.set(CONTROL_PARAMS["memory"])
         minvel_slider.set(ACOUSTIC_PARAMS["min_vel"])
-        rolling_freq_slider.set(CONTROL_PARAMS["rolling_frequency"])
+        rolling_freq_slider.set(MAGNETIC_FIELD_PARAMS["rolling_frequency"])
         arrival_thresh_slider.set(CONTROL_PARAMS["arrival_thresh"])
-        gamma_slider.set(CONTROL_PARAMS["gamma"])
-        psi_slider.set(CONTROL_PARAMS["psi"])
+        gamma_slider.set(MAGNETIC_FIELD_PARAMS["gamma"])
+        psi_slider.set(MAGNETIC_FIELD_PARAMS["psi"])
 
         lower_thresh_slider.pack()
         upper_thresh_slider.pack()
@@ -1168,12 +1168,12 @@ class GUI:
             video_name = self.external_file
 
         
-        robot_list = tracker.main(video_name, self.arduino, self.AcousticModule)
+        robot_list, magnetic_field_params = tracker.main(video_name, self.arduino, self.AcousticModule)
 
         if self.get_widget(self.checkboxes_frame, "savepickle").var.get():
             if len(robot_list) > 0:
                 output_name = str(self.get_widget(self.video_record_frame, "output_name").get())
-                analyze = Analysis(CONTROL_PARAMS, CAMERA_PARAMS,STATUS_PARAMS,robot_list)
+                analyze = Analysis(CONTROL_PARAMS, CAMERA_PARAMS,STATUS_PARAMS,robot_list,magnetic_field_params)
                 analyze.convert2pickle(output_name)
                 #analyze.plot()
 
@@ -1274,22 +1274,18 @@ class GUI:
             actions = j_queue.get(0)
 
             alpha = actions[6] - np.pi/2 #subtract 90 for rolling 
-            gamma = CONTROL_PARAMS["gamma"]  * np.pi/180
-            psi = CONTROL_PARAMS["psi"]  * np.pi/180
+            gamma = np.radians(MAGNETIC_FIELD_PARAMS["gamma"])  
+            psi = np.radians(MAGNETIC_FIELD_PARAMS["psi"])
 
             if actions[8] != 0:  
-                freq = CONTROL_PARAMS["rolling_frequency"]
+                freq = MAGNETIC_FIELD_PARAMS["rolling_frequency"]
             else:
                 freq = 0
-            #freq = actions[8]
-            #gamma = actions[7]
+
             MAGNETIC_FIELD_PARAMS["Bx"] = actions[0]
             MAGNETIC_FIELD_PARAMS["By"] = actions[1]
             MAGNETIC_FIELD_PARAMS["Bz"] = actions[2]
             MAGNETIC_FIELD_PARAMS["alpha"] = alpha
-            MAGNETIC_FIELD_PARAMS["gamma"] = gamma
-            MAGNETIC_FIELD_PARAMS["psi"] = psi
-            MAGNETIC_FIELD_PARAMS["freq"] = freq
 
             
             

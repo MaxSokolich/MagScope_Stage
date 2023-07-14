@@ -5,7 +5,8 @@ import math
 class AxisProjection:
 
     def projection(self, window, Bx,By,Bz,alpha, gamma, pitch, yaw, roll, w, h, offsetx, offsety,title):
-    
+        
+        gamma = np.radians(gamma)
         def spherical_to_cartesian(rho, theta, phi):
             x = rho * np.sin(phi) * np.cos(theta)
             y = rho * np.sin(phi) * np.sin(theta)

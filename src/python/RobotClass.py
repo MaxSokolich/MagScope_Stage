@@ -33,7 +33,6 @@ class Robot:
         self.trajectory = []  # track points from manual pathing
         self.times = []  #time step per frame in seconds
         self.acoustic_freq = []#acoustic frequency applied
-        self.magnetic_field_params = [] #magnetic field params applied at that instant
 
 
     def add_area(self, area: float):
@@ -159,19 +158,8 @@ class Robot:
         """
         self.times.append(time)
     
-    def add_magnetic_field_params(self,actions): #I cant remember if this cannot be a dictionary or something
-        """
-        Add current magnetic field values being applied
 
-        Args:
-            actions: [Bx, By, Bz, alpha, gamma, freq, psi]
-
-        Returns:
-            None
-        """
-        self.magnetic_field_params.append(actions)
-
-    def as_dict(self,magnetic_field_params) -> dict:
+    def as_dict(self) -> dict:
         """
         Convert's the bot's current frame and position information into a
         readable dictionary
@@ -192,7 +180,7 @@ class Robot:
             "Avg Area": self.avg_area,
             "Trajectory": self.trajectory,
             "Acoustic Frequency": self.acoustic_freq,
-            "Magnetic Field Params": self.magnetic_field_params
+ 
         }
 
         return mydict

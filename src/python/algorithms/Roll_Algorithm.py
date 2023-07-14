@@ -81,14 +81,12 @@ class Roll_Algorithm:
                 #OUTPUT SIGNAL
                 my_alpha = self.alpha - np.pi/2  #subtract 90 for roll
                 alpha = round(my_alpha,2)
-                gamma = self.control_params["gamma"] * np.pi/180
-                psi = self.control_params["psi"] * np.pi/180
-                freq = self.control_params["rolling_frequency"]
+                gamma = np.radians(MAGNETIC_FIELD_PARAMS["gamma"]) 
+                psi = np.radians(MAGNETIC_FIELD_PARAMS["psi"])
+                freq = MAGNETIC_FIELD_PARAMS["rolling_frequency"]
                 
                 MAGNETIC_FIELD_PARAMS["alpha"] = alpha
-                MAGNETIC_FIELD_PARAMS["gamma"] = gamma
-                MAGNETIC_FIELD_PARAMS["psi"] = psi
-                MAGNETIC_FIELD_PARAMS["freq"] = freq
+                
                 
                 
 

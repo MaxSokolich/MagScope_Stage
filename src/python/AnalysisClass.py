@@ -13,11 +13,13 @@ class Analysis:
                  control_params: dict,
                  camera_params: dict,
                  status_params: dict,
-                 robot_list):
+                 robot_list,
+                 magnetic_field_params):
         self.control_params = control_params
         self.camera_params = camera_params
         self.status_params = status_params
         self.robot_list = robot_list
+        self.magnetic_field_params = magnetic_field_params
 
 
         self.width = 2448
@@ -37,14 +39,15 @@ class Analysis:
                 filename:   name of output file
 
             Returns:
-                None
+                None but saves a pickle file containing the current robot list and magnetic field params [robot_list, magnetic_field_params] 
             """
             
             pickles = []
-            print(" --- writing robots ---")
+            print(" --- writing {} robots ---".format(len(self.robot_list)))
             for bot in tqdm(self.robot_list):
                 if len(bot.area_list) > 1:
                     pickles.append(bot.as_dict())
+            pickles.append(self.magnetic_field_params)
             filename = "src/data/"+filename
             print(" -- writing pickle --")
             with open(filename + ".pickle", "wb") as handle:

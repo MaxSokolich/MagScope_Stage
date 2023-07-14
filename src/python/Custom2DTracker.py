@@ -81,7 +81,7 @@ class Tracker:
 
         self.cp = ContourProcessor(self.control_params,use_cuda)
         self.Algorithm = AlgorithmHandler()
-
+        self.Acoustic_Class = None
         self.projection = AxisProjection()
 
         self.main_window = main_window
@@ -89,6 +89,9 @@ class Tracker:
         self.robot_window = None
         self.robot_var_list = []
         self.robot_checklist_list = []
+
+        #create an array to store the current magnetic field params
+        self.magnetic_field_params = []
 
     
 
@@ -138,6 +141,8 @@ class Tracker:
 
             
 
+            
+
         # Right mouse click event; allows you to draw the trajectory of the
         # most currently added microbot, so long as the button is held
         elif event == cv2.EVENT_RBUTTONDOWN:
@@ -170,12 +175,17 @@ class Tracker:
             del self.robot_checklist_list[:]
             del self.robot_var_list[:]
             del self.robot_list[:]
+            del self.magnetic_field_params[:] #if we reset the robots, we also want to reset the magnetic_field_params list
+
             if params["arduino"].conn is not None:
                 params["arduino"].send(0, 0, 0, 0, 0, 0, 0)
 
             #reset robot checkboxes
             self.robot_window = Frame(master= self.main_window)#Toplevel(self.main_window)
             self.robot_window.grid(row=1,column=4, rowspan=7)
+
+            #stop Acoustic Class if its on
+            self.Acoustic_Class.stop()
 
 
     def create_robot_checkbox(self, window):
@@ -190,6 +200,7 @@ class Tracker:
         """
         del self.robot_var_list[:]
         del self.robot_checklist_list[:]
+       
         for bot_id in range(len(self.robot_list)):
             robot_var = IntVar(master=window, name=str(bot_id))
 
@@ -236,87 +247,6 @@ class Tracker:
 
 
 
-    def track_robot_position(
-        self,
-        avg_area: float,
-        bot: Robot,
-        cropped_frame: np.ndarray,
-        new_pos: Tuple[int, int],
-        current_pos: int,
-        blur: float,
-        max_dim: Tuple[int, int],
-        fps: FPSCounter,
-        pix_2metric: float
-    ):
-        """
-        Calculate and display circular marker for a bot's position. Uses the bot's positional data,
-        average area, cropped frames, and maximum dimensions of its contours to make calculations.
-
-        If contours were found from the previous step, calculate the area of the contours and
-        append it to the Robot class. Then, update global average running list of areas.
-
-        Based on the current position calculate above, adjust cropped area dimensions for
-        next frame, and finally update Robot class with new cropped dimension, position,
-        velocity, and area.
-
-        Args:
-            avg_area:   average contour area of bot
-            bot:    the Robot class being tracked
-            cropped_frame:  cropped frame img containing the microbot
-            new_pos:    tuple containing the starting X and Y position of bot
-            current_pos:    current position of bot in the form of [x, y]
-            max_dim:  tuple with maximum width and height of all contours
-            pix_2metric:  (pix/um )conversion factor from pixels to um: depends on rsize scale and objective
-
-        Returns:
-            None
-        """
-        # calcuate and analyze contours areas
-        bot.add_area(avg_area)
-        avg_global_area = sum(bot.area_list) / len(bot.area_list)
-        bot.set_avg_area(avg_global_area)
-        # update cropped region based off new position and average area
-
-        x_1, y_1 = new_pos
-        max_width, max_height = max_dim
-        x_1_new = x_1 + current_pos[0] - max_width
-        y_1_new = y_1 + current_pos[1] - max_height
-        x_2_new = 2* max_width
-        y_2_new = 2* max_height
-        new_crop = [int(x_1_new), int(y_1_new), int(x_2_new), int(y_2_new)]
-        
-        
-
-        # calculate velocity based on last position and self.fps
-        #print(pix_2metric)
-        if len(bot.position_list) > 5:
-            velx = (
-                (current_pos[0] + x_1 - bot.position_list[-5][0])
-                * (fps.get_fps()/5)/ (pix_2metric)
-            )
-
-            vely = (
-                (current_pos[1] + y_1 - bot.position_list[-5][1])
-                * (fps.get_fps()/5) / (pix_2metric)
-                
-            )
-
-            velz = 0
-            if len(bot.blur_list) > 0:
-                velz = (bot.blur_list[-1] - blur)    #This needs to be scaled or something (takes the past 5th blur value to get a rate)
-            vel = Velocity(velx, vely, 0)
-            bot.add_velocity(vel)
-          
-        # update robots params
-        bot.add_crop(new_crop)
-        bot.add_position([current_pos[0] + x_1, current_pos[1] + y_1])
-        bot.add_blur(blur)
-        bot.add_frame(self.frame_num)
-        bot.add_time(round(time.time()-self.start,2))
-        bot.add_acoustic_freq(ACOUSTIC_PARAMS["acoustic_freq"])
-   
-    
-        
 
     def detect_robot(self, frame: np.ndarray, fps: FPSCounter, pix_2metric: float):
         """
@@ -423,8 +353,7 @@ class Tracker:
                 self.robot_list[bot].add_time(round(time.time()-self.start,2))
                 self.robot_list[bot].add_acoustic_freq(ACOUSTIC_PARAMS["acoustic_freq"])
                 
-                if STATUS_PARAMS["joystick_status"] == True or STATUS_PARAMS["algorithm_status"] == True:
-                    self.robot_list[bot].add_magnetic_field_params(MAGNETIC_FIELD_PARAMS) # this should just be a single list instead of saving it for each bot not very efficent
+               
                
                 
            
@@ -487,7 +416,7 @@ class Tracker:
             thickness=linethickness
         )
 
-        psi = "psi: "+ str(CONTROL_PARAMS["psi"])
+        psi = "psi: "+ str(MAGNETIC_FIELD_PARAMS["psi"])
         cv2.putText(frame,psi,
             (int(w* (9/10)),int(h / 40)),
             cv2.FONT_HERSHEY_SIMPLEX,
@@ -497,7 +426,7 @@ class Tracker:
           
         )
 
-        gamma = "gamma: " +str(CONTROL_PARAMS["gamma"])
+        gamma = "gamma: " +str(MAGNETIC_FIELD_PARAMS["gamma"])
         cv2.putText(frame,gamma,
             (int(w ),int(h / 40)),
             cv2.FONT_HERSHEY_SIMPLEX,
@@ -523,6 +452,7 @@ class Tracker:
         w1 = frame.shape[0]
         h1 = frame.shape[1]
         Bx,By,Bz = MAGNETIC_FIELD_PARAMS["Bx"],MAGNETIC_FIELD_PARAMS["By"],MAGNETIC_FIELD_PARAMS["Bz"]
+
         frame, scaling = self.projection.draw_sideview(frame, Bx,By,Bz,MAGNETIC_FIELD_PARAMS["alpha"], MAGNETIC_FIELD_PARAMS["gamma"],w1,h1 )
         frame, scaling = self.projection.draw_topview(frame, Bx,By,Bz,MAGNETIC_FIELD_PARAMS["alpha"], MAGNETIC_FIELD_PARAMS["gamma"],w1,h1 )
         
@@ -628,6 +558,7 @@ class Tracker:
         Returns:
             None
         """
+        self.Acoustic_Class = AcousticClass
         #create robot window
         self.robot_window = Frame(master= self.main_window)#Toplevel(self.main_window)
         self.robot_window.grid(row=1,column=4, rowspan=7)
@@ -703,6 +634,10 @@ class Tracker:
             self.frame_num += 1  # increment frame
 
             if self.num_bots > 0:
+                if STATUS_PARAMS["joystick_status"] == True or STATUS_PARAMS["algorithm_status"] == True:  #if we start acuated the bots, record the action commands
+                    current_field_params = MAGNETIC_FIELD_PARAMS.copy()
+                    self.magnetic_field_params.append([self.frame_num, current_field_params])
+            
                 #print(sys.getsizeof(self.robot_list[-1].position_list), " bytes")
                 # DETECT ROBOTS AND UPDATE TRAJECTORY
                 self.detect_robot(frame, fps_counter,self.pix_2metric)
@@ -721,7 +656,7 @@ class Tracker:
             # UPDATE AND DISPLAY HUD ELEMENTS
             self.display_hud(frame, fps_counter)
             
-            # add videos a seperate list to save space and write the video afterwords
+            # save videos
             if self.status_params["record_status"]:
                 output_name = self.camera_params["outputname"]
                 if rec_start_time is None:
@@ -763,9 +698,9 @@ class Tracker:
                 self.textbox.see("end")
 
                 if len(self.robot_list) > 0:
-                    analyze = Analysis(self.control_params, self.camera_params,self.status_params,self.robot_list)
+                    analyze = Analysis(self.control_params, self.camera_params,self.status_params,self.robot_list, self.magnetic_field_params)
                     analyze.convert2pickle(output_name)
-                #analyze.plot()
+               
 
         
             
@@ -789,8 +724,12 @@ class Tracker:
 
         
         cam.release()
+
         if result is not None:
             result.release()
+            if len(self.robot_list) > 0:
+                analyze = Analysis(self.control_params, self.camera_params,self.status_params,self.robot_list,self.magnetic_field_params)
+                analyze.convert2pickle(output_name)
         
 
         
@@ -801,7 +740,7 @@ class Tracker:
         del self.robot_checklist_list[:]
         del self.robot_var_list[:]
 
-        return self.robot_list
+        return self.robot_list, self.magnetic_field_params
             
       
        
