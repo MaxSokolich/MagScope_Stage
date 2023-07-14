@@ -203,7 +203,7 @@ class GUI:
             text="Track", 
             command=self.track, 
             height=4, 
-            width=10,
+            width=20,
             bg = 'blue',
             fg= 'white'
         )
