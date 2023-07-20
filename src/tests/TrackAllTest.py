@@ -1,4 +1,7 @@
-import EasyPySpin
+try:
+    import EasyPySpin
+except:
+    pass
 import warnings
 
 import pandas as pd
@@ -42,8 +45,9 @@ def create_robotlist(filepath: Union[str, None]):
         if filepath is None:
             try:
                 cam = EasyPySpin.VideoCapture(0)
-            except EasyPySpin.EasyPySpinWarning:
+            except Exception:
                 print("EasyPySpin camera not found, using standard camera")
+                cam = cv2.VideoCapture("/Users/bizzarohd/Desktop/PhD/Overview/spinningmanipulationarrow.avi")
             # cam = cv2.VideoCapture(0)
         else:
             # Use when reading in a video file
@@ -52,59 +56,59 @@ def create_robotlist(filepath: Union[str, None]):
         width = int(cam.get(cv2.CAP_PROP_FRAME_WIDTH))
         height = int(cam.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
+        while True:
+            success,firstframe = cam.read()
+            resize_scale = CAMERA_PARAMS["resize_scale"]
+            resize_ratio = (
+                    width * resize_scale // 100,
+                    height * resize_scale // 100,
+                )
+            firstframe = cv2.resize(firstframe, resize_ratio, interpolation=cv2.INTER_AREA)
 
-        success,firstframe = cam.read()
-        resize_scale = CAMERA_PARAMS["resize_scale"]
-        resize_ratio = (
-                width * resize_scale // 100,
-                height * resize_scale // 100,
-            )
-        firstframe = cv2.resize(firstframe, resize_ratio, interpolation=cv2.INTER_AREA)
+            crop_mask = cv2.cvtColor(firstframe, cv2.COLOR_BGR2GRAY)
+            crop_mask = cv2.GaussianBlur(crop_mask, (21,21), 0)
+            crop_mask = cv2.inRange(crop_mask, control_params["lower_thresh"], control_params["upper_thresh"])
+            contours, _ = cv2.findContours(crop_mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
-        crop_mask = cv2.cvtColor(firstframe, cv2.COLOR_BGR2GRAY)
-        crop_mask = cv2.GaussianBlur(crop_mask, (21,21), 0)
-        crop_mask = cv2.inRange(crop_mask, control_params["lower_thresh"], control_params["upper_thresh"])
-        contours, _ = cv2.findContours(crop_mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+            areas = []  
+            
+            
+            for contour in contours: #treating each contour as a robot
+                # remove small elements by calcualting arrea
+                area = cv2.contourArea(contour)
+                areas.append(area)
 
-        areas = []  
+            print(areas)
+            print(np.mean(np.array(areas)))
+
+            frame = cv2.cvtColor(crop_mask, cv2.COLOR_GRAY2BGR)
+            for contour in contours: #treating each contour as a robot
+                # remove small elements by calcualting arrea
+                area = cv2.contourArea(contour)
+
+                if area >= np.mean(np.array(areas))/2:  # and area < 3000:# and area < 2000: #pixels
+
+
+                    x, y, w, h = cv2.boundingRect(contour)
+                    current_pos = [(x + x + w) / 2, (y + y + h) / 2]
+
+                    x,y = current_pos
+
+                    x_1 = int(x - control_params["bounding_length"] / 2)
+                    y_1 = int(y - control_params["bounding_length"] / 2)
+                    w = control_params["bounding_length"]
+                    h = control_params["bounding_length"]
+
+                    cv2.drawContours(frame, contour, -1, (0, 0, 255), 2)
         
-        
-        for contour in contours: #treating each contour as a robot
-            # remove small elements by calcualting arrea
-            area = cv2.contourArea(contour)
-            areas.append(area)
 
-        print(areas)
-        print(np.mean(np.array(areas)))
-
-        frame = cv2.cvtColor(crop_mask, cv2.COLOR_GRAY2BGR)
-        for contour in contours: #treating each contour as a robot
-            # remove small elements by calcualting arrea
-            area = cv2.contourArea(contour)
-
-            if area >= np.mean(np.array(areas))/2:  # and area < 3000:# and area < 2000: #pixels
-
-
-                x, y, w, h = cv2.boundingRect(contour)
-                current_pos = [(x + x + w) / 2, (y + y + h) / 2]
-
-                x,y = current_pos
-
-                x_1 = int(x - control_params["bounding_length"] / 2)
-                y_1 = int(y - control_params["bounding_length"] / 2)
-                w = control_params["bounding_length"]
-                h = control_params["bounding_length"]
-
-                cv2.drawContours(frame, contour, -1, (0, 0, 255), 2)
-     
-
-                
-                #create checkboxes for each robot
-        
-        #self.create_robot_checkbox(self.robot_window)
-        
-        cv2.imwrite("initialmask.png",frame)
-        cam.release()
+                    
+                    #create checkboxes for each robot
+            
+            #self.create_robot_checkbox(self.robot_window)
+            
+            cv2.imwrite("initialmask.png",frame)
+            cam.release()
        
 filepath = "/home/max/Documents/MagScopeSystem/videos/mickyroll1.mp4"
 create_robotlist(None)

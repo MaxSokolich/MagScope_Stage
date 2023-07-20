@@ -20,6 +20,10 @@ import threading
 import colorsys
 from queue import Empty
 import multiprocessing
+multiprocessing.set_start_method('forkserver', force=True)
+multiprocessing.freeze_support()
+import cv2
+from datetime import datetime
 import time as time
 import numpy as np
 from typing import Union
@@ -35,10 +39,11 @@ from src.python.ArduinoHandler import ArduinoHandler
 from src.python.Brightness import Brightness
 from src.python.AnalysisClass import Analysis
 from src.python.PS4_Linux import MyController
-from src.python.Params import CONTROL_PARAMS, CAMERA_PARAMS, STATUS_PARAMS, ACOUSTIC_PARAMS, MAGNETIC_FIELD_PARAMS,PID_PARAMS
+from src.python.Params import CONTROL_PARAMS, CAMERA_PARAMS, STATUS_PARAMS, ACOUSTIC_PARAMS, MAGNETIC_FIELD_PARAMS,PID_PARAMS,MASK
 
 if "mac" in platform.platform():
     from src.python.PS4_Mac import MyController
+    #from tkmacosx import Button
 elif "linux" in platform.platform():
     from src.python.PS4_Linux import MyController
 elif "windows" in platform.platform():
@@ -63,6 +68,7 @@ class GUI:
     def __init__(self, master: Tk, arduino: ArduinoHandler):
         # Tkinter window attributes
         self.main_window = master
+
         self.screen_width = self.main_window.winfo_screenwidth()
         self.screen_height = self.main_window.winfo_screenheight()
         self.x, self.y = 0, 0
@@ -88,6 +94,7 @@ class GUI:
         # Tracker-related attributes
         self.arduino = arduino
         self.external_file = None
+
 
 
         
@@ -175,7 +182,7 @@ class GUI:
 
         close_button = Button(master, 
             text="Exit", 
-            width=10, 
+            width=20, 
             height=4, 
             command=self.exit, 
             bg = 'black',
@@ -198,18 +205,20 @@ class GUI:
             fg= 'white'
         )
 
-        track_button = Button(
+        self.track_button = Button(
             self.Big_button_frame, 
             text="Track", 
             command=self.track, 
             height=4, 
             width=20,
+            relief="raised",
+            highlightbackground = "blue",
             bg = 'blue',
             fg= 'white'
         )
 
         status_button.grid(row=0, column=0)
-        track_button.grid(row=1, column=0)
+        self.track_button.grid(row=1, column=0)
 
 
         #3 CHECKBOXES FRAME
@@ -238,11 +247,8 @@ class GUI:
         )
         livecam_button.var = live_var
     
-        
-
-       
-
-        cuda_var = IntVar(master=master, name="cuda_var")
+    
+        """cuda_var = IntVar(master=master, name="cuda_var")
         cuda_button = Checkbutton(
             master=self.checkboxes_frame,
             name="cuda_checkbox",
@@ -252,10 +258,27 @@ class GUI:
             offvalue=0,
         )
         cuda_button.var = cuda_var
+        cuda_button.grid(row=2, column=0)"""
+
 
         vid_name.grid(row=0, column=0)
         livecam_button.grid(row=1, column=0)
-        cuda_button.grid(row=2, column=0)
+        
+
+        self.mask_button = Button(
+            self.checkboxes_frame, 
+            text="View Mask", 
+            command=self.viewmask, 
+            height=1, 
+            width=10,
+            relief="raised",
+            highlightbackground = "blue",
+            bg = 'blue',
+            fg= 'black'
+        )
+        self.mask_button.grid(row=2, column=0)
+
+        
 
         orientsign_button = Button(
             self.checkboxes_frame, 
@@ -424,7 +447,7 @@ class GUI:
             text="Joystick On", 
             command=self.joy_proc, 
             height=1, 
-            width=18,
+            width=10,
             bg = 'magenta',
             fg= 'white'
         )
@@ -434,7 +457,7 @@ class GUI:
             text="Sensor On", 
             command=self.sensor_proc, 
             height=1, 
-            width=18,
+            width=10,
             bg = 'black',
             fg= 'white'
         )
@@ -458,13 +481,6 @@ class GUI:
         
         
         
-       
-        
-
-    
-       
-        
-
 
 
     def orientsign(self):
@@ -472,7 +488,29 @@ class GUI:
         self.text_box.insert(END,"sign of Bx = {}\n".format(STATUS_PARAMS["orientsign"]))
         self.text_box.see("end")
 
-        
+
+    def viewmask(self):
+        if self.mask_button.config("relief")[-1] == "sunken":
+            self.mask_button.config(relief = "raised")
+            self.mask_button.config(text = "View Mask", bg = 'blue',fg= 'black',highlightbackground = "blue")
+            
+            if MASK["img"] is not None:
+                out = "src/imgs/mask.png"   #svae  mask to png
+                cv2.imwrite(out, MASK["img"])
+
+                STATUS_PARAMS["mask_status"] = False
+                cv2.destroyWindow("Max's Mask")
+                self.text_box.insert(END,"Saved Mask\n to "+ out +"\n")
+                self.text_box.see("end")
+
+        else:
+            self.mask_button.config(relief = "sunken")
+            self.mask_button.config(text = "Close Mask", bg = 'blue',fg= 'red',highlightbackground = "red")
+
+            STATUS_PARAMS["mask_status"] = True
+            self.text_box.insert(END,"Displaying Mask\n")
+            self.text_box.see("end")
+            
 
 
     def upload_vid(self):
@@ -671,7 +709,7 @@ class GUI:
         tracking_frame_slider = Scale(
             master=window3,
             label="tracking frame size",
-            from_=1,
+            from_=.5,
             to=5,
             resolution=.1,
             variable=tracking_frame,
@@ -1144,6 +1182,7 @@ class GUI:
         """
 
         STATUS_PARAMS["record_status"] = False
+        CAMERA_PARAMS["outputname"] =  str(datetime.now())
 
     def track(self):
         """
@@ -1156,30 +1195,49 @@ class GUI:
             None
         """
 
+        if self.track_button.config("relief")[-1] == "sunken":
+            self.track_button.config(relief = "raised")
+            self.track_button.config(text = "Track",bg = 'blue',fg= 'white',highlightbackground = "blue")
+            STATUS_PARAMS["tracker_status"] = False
+ 
 
-        
-        tracker = Tracker(self.main_window, self.text_box,
+        else:
+            self.track_button.config(relief = "sunken")
+            STATUS_PARAMS["tracker_status"] = True
+            self.track_button.config(text = "Close Tracker, \nSave Data if Applicable", bg = 'blue',fg= 'red',highlightbackground = "red")
+          
+            tracker = Tracker(self.main_window, self.text_box,
             CONTROL_PARAMS,
             CAMERA_PARAMS,
             STATUS_PARAMS,
-            self.get_widget(self.checkboxes_frame, "cuda_checkbox").var.get(),
-        )
-        #self.tracker = tracker
+            False,#self.get_widget(self.checkboxes_frame, "cuda_checkbox").var.get(),
+            )
+            #self.tracker = tracker
 
-        if (self.get_widget(self.checkboxes_frame, "live_checkbox").var.get()):
-            video_name = None
-        else:
-            video_name = self.external_file
+            if (self.get_widget(self.checkboxes_frame, "live_checkbox").var.get()):
+                video_name = None
+            else:
+                video_name = self.external_file
+
+            
+            robot_list = tracker.main(video_name, self.arduino, self.AcousticModule)
+
+            
+            if self.get_widget(self.main_window, "savepickle").var.get():
+                if len(robot_list) > 0:
+                    output_name = str(self.get_widget(self.video_record_frame, "output_name").get())
+                    analyze = Analysis(CONTROL_PARAMS, CAMERA_PARAMS,STATUS_PARAMS,robot_list)
+                    analyze.convert2pickle(output_name)
+
+
+            
+                
+            
+
 
         
-        robot_list = tracker.main(video_name, self.arduino, self.AcousticModule)
-
-        if self.get_widget(self.main_window, "savepickle").var.get():
-            if len(robot_list) > 0:
-                output_name = str(self.get_widget(self.video_record_frame, "output_name").get())
-                analyze = Analysis(CONTROL_PARAMS, CAMERA_PARAMS,STATUS_PARAMS,robot_list)
-                analyze.convert2pickle(output_name)
-                #analyze.plot()
+        
+        
 
         
 
@@ -1196,7 +1254,7 @@ class GUI:
             None
         """
        
-
+        
         STATUS_PARAMS["algorithm_status"] = False
         
         self.text_box.insert(END, "____ZEROED ____\n")
@@ -1360,6 +1418,8 @@ class GUI:
         Returns:
             None
         """
+        STATUS_PARAMS["tracker_status"] = False
+        cv2.destroyAllWindows()
         self.AcousticModule.exit()
         self.main_window.quit()
         self.main_window.destroy()

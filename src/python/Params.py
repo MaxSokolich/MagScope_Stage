@@ -26,7 +26,8 @@ CAMERA_PARAMS = {
     "framerate": 24, 
     "exposure": 15000,   #6000
     "Obj": 10,
-    "outputname": str(datetime.now())}
+    "outputname": str(datetime.now()),
+    }
 
 STATUS_PARAMS = {
     "rolling_status": 0,
@@ -38,6 +39,8 @@ STATUS_PARAMS = {
     "record_status": False,
     "orientsign": 1,
     "joystick_status": False,
+    "mask_status": False,
+    "tracker_status": False,
 }
 
 ACOUSTIC_PARAMS = {
@@ -58,3 +61,5 @@ MAGNETIC_FIELD_PARAMS = {
     "psi": 90,
    
 }
+
+MASK = {"img": None}  #image of  mask

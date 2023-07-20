@@ -25,7 +25,7 @@ from src.python.FPSCounter import FPSCounter
 from src.python.AlgorithmHandler  import AlgorithmHandler 
 from src.python.Projection import AxisProjection
 from src.python.AcousticClass import AcousticClass
-from src.python.Params import CONTROL_PARAMS, CAMERA_PARAMS, STATUS_PARAMS, ACOUSTIC_PARAMS, MAGNETIC_FIELD_PARAMS,PID_PARAMS
+from src.python.Params import CONTROL_PARAMS, CAMERA_PARAMS, STATUS_PARAMS, ACOUSTIC_PARAMS, MAGNETIC_FIELD_PARAMS,PID_PARAMS, MASK
 
 try:
     import EasyPySpin
@@ -63,7 +63,6 @@ class Tracker:
         # self.raw_frames = []
         # self.bot_loc = None
         # self.target = None
-        self.curr_frame = np.array([])
         self.num_bots = 0  # current number of bots
         self.frame_num = 0  # current frame count
         self.elapsed_time = 0  # time elapsed while tracking
@@ -349,6 +348,36 @@ class Tracker:
                 
                
                
+    def ViewMask(self, frame):
+        """
+        computes a global mask on the image
+        
+        Args:
+            frame
+        Returns:
+            mask
+        """
+        mask = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+        blur = self.cp.calculate_blur(mask)
+
+        kernel = self.cp.get_blur_kernel(blur)   # dynamic kernel
+
+        if kernel is not None:
+            mask = cv2.GaussianBlur(mask, kernel, 0)
+
+
+        brightness, contrast = self.cp.get_brightness_and_contrast(blur)
+        mask = self.cp.apply_brightness_contrast(mask, brightness, contrast)
+
+        lower_thresh =  self.control_params["lower_thresh"]
+        upper_thresh = self.control_params["upper_thresh"]
+        mask = cv2.inRange(mask, lower_thresh, upper_thresh)
+
+        return mask
+
+
+
 
     def get_fps(self, fps: FPSCounter, frame: np.ndarray, scaling):
         """
@@ -425,6 +454,7 @@ class Tracker:
             color = (255, 255, 255),
           
         )
+        return frame
 
 
 
@@ -448,7 +478,7 @@ class Tracker:
         
         linethickness, thickness, fontScale = scaling
         
-        self.get_fps(fps, frame, scaling)
+        frame = self.get_fps(fps, frame, scaling)
         #frame = cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
 
         if len(self.robot_list) > 0:
@@ -525,6 +555,7 @@ class Tracker:
                     thickness=thickness,
                     color = bot_color,
                     )
+        return frame
                 
                 
                 
@@ -580,7 +611,7 @@ class Tracker:
 
 
         #params = {"arduino": arduino}
-        cv2.namedWindow("im")  # name of CV2 window
+        cv2.namedWindow("Max's Tracker")  # name of CV2 window
         #cv2.setMouseCallback("im", self.mouse_points, params)  # set callback func
 
         # %%
@@ -593,19 +624,17 @@ class Tracker:
         # is reached
         
         while True:
+
+
             fps_counter.update()
             success, frame = cam.read()
-            params = {"arduino": arduino, "frame":frame}
-            cv2.setMouseCallback("im", self.mouse_points, params)
-            
-        
-
-            self.curr_frame = frame
             if not success or frame is None:
                 self.textbox.insert(END,"No more frames...\n")
                 self.textbox.see("end")
+                cam.release()
+                cv2.destroyAllWindows()
                 break
-
+            
             # Set exposure of camera
             cam.set(cv2.CAP_PROP_EXPOSURE, self.camera_params["exposure"])
             cam.set(cv2.CAP_PROP_FPS, self.camera_params["framerate"])
@@ -616,102 +645,133 @@ class Tracker:
                 self.height * resize_scale // 100,
             )
             frame = cv2.resize(frame, resize_ratio, interpolation=cv2.INTER_AREA)
-
+            
+            
             #calculate pixel to metric for varying res
             #106.2 um = 1024 pixels  @ 50%  resize and 100 x
             self.pix_2metric = ((resize_ratio[1]/106.2)  / 100) * self.camera_params["Obj"] *2 #divide by 2 cuz did scale calc on .5x adapter
-            
-            self.frame_num += 1  # increment frame
-
-            if self.num_bots > 0:
-            
-                #print(sys.getsizeof(self.robot_list[-1].position_list), " bytes")
-                # DETECT ROBOTS AND UPDATE TRAJECTORY
-                self.detect_robot(frame, fps_counter,self.pix_2metric)
-
-                # APPLY SELECTED CONTROL ALGORITHM
-                if self.status_params["algorithm_status"] == True:
-                    self.Algorithm.run(self.robot_list, 
-                                       self.control_params, 
-                                       self.camera_params,
-                                       self.status_params, 
-                                       arduino, 
-                                       AcousticModule,
-                                       frame)
 
             
-            # UPDATE AND DISPLAY HUD ELEMENTS
-            self.display_hud(frame, fps_counter)
             
-            # save videos
-            if self.status_params["record_status"]:
-                output_name = self.camera_params["outputname"]
-                if rec_start_time is None:
-                    rec_start_time = time.time()
 
-                if result is None:
-                    print(resize_ratio)
-                    result = cv2.VideoWriter(
-                        "src/videos/"+output_name + ".mp4",
-                        cv2.VideoWriter_fourcc(*"mp4v"),
-                        int(self.camera_params["framerate"]),    
-                        resize_ratio, 
-                        
-                    )  #int(fps.get_fps()) False for gray
-                    self.textbox.insert(END, "Begin Record\n")
-                    self.textbox.see("end")
-                    
 
+            #now split two the two views
+            if STATUS_PARAMS["mask_status"] == True:  #if we want to view the mask, pause the other feed to avoid delays
+                cv2.namedWindow("Max's Mask")
+
+                params = {"arduino": arduino, "frame":frame}
+                cv2.setMouseCallback("Max's Mask", self.mouse_points, params)
                 
-                cv2.putText(
-                    frame,
-                    "time (s): " + str(np.round(time.time() - rec_start_time, 2)),
-                    (
-                        int((self.width * resize_scale / 100) * (7 / 10)),
-                        int((self.height * resize_scale / 100) * (9.9 / 10)),
-                    ),
-                    cv2.FONT_HERSHEY_COMPLEX,
-                    0.5,
-                    (255, 255, 255),
-                    1
-                )
-                result.write(frame)
+                
+                mask = self.ViewMask(frame)
+                MASK["img"] = mask  #save the mask for later
 
-            elif result is not None and not self.status_params["record_status"]:
-                result.release()
-                rec_start_time = None 
-                result = None
-                self.textbox.insert(END, "End Record\n")
-                self.textbox.see("end")
+                #display hud stuff
+                mask = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
+                
 
-                if len(self.robot_list) > 0:
-                    analyze = Analysis(self.control_params, self.camera_params,self.status_params,self.robot_list)
-                    analyze.convert2pickle(output_name)
-               
+                if self.num_bots > 0:
+                    self.detect_robot(mask, fps_counter,self.pix_2metric)
+                
+                mask = self.display_hud(mask, fps_counter)
 
-        
+                self.check_robot_checkbox_status()
+                cv2.imshow("Max's Mask", mask)
+            else:
+
+                params = {"arduino": arduino, "frame":frame}
+                cv2.setMouseCallback("Max's Tracker", self.mouse_points, params)
+                
+
+                self.frame_num += 1  # increment frame
+
+                if self.num_bots > 0:
+                
+                    #print(sys.getsizeof(self.robot_list[-1].position_list), " bytes")
+                    # DETECT ROBOTS AND UPDATE TRAJECTORY
+                    self.detect_robot(frame, fps_counter,self.pix_2metric)
+
+                    # APPLY SELECTED CONTROL ALGORITHM
+                    if self.status_params["algorithm_status"] == True:
+                        self.Algorithm.run(self.robot_list, 
+                                        self.control_params, 
+                                        self.camera_params,
+                                        self.status_params, 
+                                        arduino, 
+                                        AcousticModule,
+                                        frame)
+
             
-            self.check_robot_checkbox_status()  #update robot status window with approiate checkboxes
-            cv2.imshow("im", frame)
+                frame = self.display_hud(frame, fps_counter)
 
-            
+
+                # save videos
+                if self.status_params["record_status"]:
+                    output_name = self.camera_params["outputname"]
+                    if rec_start_time is None:
+                        rec_start_time = time.time()
+
+                    if result is None:
+                        print(resize_ratio)
+                        result = cv2.VideoWriter(
+                            "src/videos/"+output_name + ".mp4",
+                            cv2.VideoWriter_fourcc(*"mp4v"),
+                            int(self.camera_params["framerate"]),    
+                            resize_ratio, 
+                            
+                        )  #int(fps.get_fps()) False for gray
+                        self.textbox.insert(END, "Begin Record\n")
+                        self.textbox.see("end")
+                        
+
+                    
+                    cv2.putText(
+                        frame,
+                        "time (s): " + str(np.round(time.time() - rec_start_time, 2)),
+                        (
+                            int((self.width * resize_scale / 100) * (7 / 10)),
+                            int((self.height * resize_scale / 100) * (9.9 / 10)),
+                        ),
+                        cv2.FONT_HERSHEY_COMPLEX,
+                        0.5,
+                        (255, 255, 255),
+                        1
+                    )
+                    result.write(frame)
+
+                elif result is not None and not self.status_params["record_status"]:
+                    result.release()
+                    rec_start_time = None 
+                    result = None
+                    self.textbox.insert(END, "End Record\n")
+                    self.textbox.see("end")
+
+                    if len(self.robot_list) > 0:
+                        analyze = Analysis(self.control_params, self.camera_params,self.status_params,self.robot_list)
+                        analyze.convert2pickle(output_name)
+                
+                self.check_robot_checkbox_status()  #update robot status window with approiate checkboxes
+                cv2.imshow("Max's Tracker", frame)
+                    
+                
+            # Exit
             if filepath is None:
                 delay = 1
             else:
                 delay = int(((1/self.camera_params["framerate"])  -(1/75) )*1000)
             k = cv2.waitKey(delay)
+            
+            self.main_window.update()
+
+            if (STATUS_PARAMS["tracker_status"] == False) or (k & 0xFF == ord("q")):
+                break
                 
             
-            # Exit
-         
-            self.main_window.update()
-            if k & 0xFF == ord("q"):
-                break
-            
 
-        
         cam.release()
-
+        cv2.destroyAllWindows()
+        print("Closed Camera Succesfully")
+        
         if result is not None:
             result.release()
             if len(self.robot_list) > 0:
@@ -719,8 +779,6 @@ class Tracker:
                 analyze.convert2pickle(output_name)
         
 
-        
-        cv2.destroyAllWindows()
         arduino.send(0, 0, 0, 0, 0, 0, 0)
         for w in self.robot_checklist_list: w.destroy()
         self.robot_window.destroy()
@@ -728,6 +786,9 @@ class Tracker:
         del self.robot_var_list[:]
 
         return self.robot_list
+
+    
+
             
       
        

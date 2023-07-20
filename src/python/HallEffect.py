@@ -16,7 +16,11 @@ try:
     import adafruit_ads1x15.ads1115 as ADS
     from adafruit_ads1x15.analog_in import AnalogIn
     from scipy.interpolate import interp1d
+    import multiprocessing
+    multiprocessing.set_start_method('forkserver', force=True)
+    multiprocessing.freeze_support()
     from multiprocessing import Process, Queue, Event
+    
     import time
     
     class HallEffect:
