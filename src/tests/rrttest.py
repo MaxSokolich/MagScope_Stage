@@ -155,7 +155,6 @@ def RRT(img, img2, start, end, stepSize):
             # display
             cv2.circle(img2, (int(tx),int(ty)), 2,(0,0,255),thickness=3, lineType=8)
             cv2.line(img2, (int(tx),int(ty)), (int(node_list[nearest_ind].x),int(node_list[nearest_ind].y)), (0,255,0), thickness=1, lineType=8)
-            cv2.imwrite("media/"+str(i)+".jpg",img2)
             cv2.imshow("sdc",img2)
             cv2.waitKey(100)
             continue
