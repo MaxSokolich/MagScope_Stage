@@ -20,8 +20,8 @@ import threading
 import colorsys
 from queue import Empty
 import multiprocessing
-multiprocessing.set_start_method('forkserver', force=True)
-multiprocessing.freeze_support()
+#multiprocessing.set_start_method('forkserver', force=True)
+#multiprocessing.freeze_support()
 import cv2
 from datetime import datetime
 import time as time
