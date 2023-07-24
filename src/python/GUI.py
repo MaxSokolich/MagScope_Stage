@@ -46,7 +46,7 @@ if "mac" in platform.platform():
     #from tkmacosx import Button
 elif "linux" in platform.platform():
     from src.python.PS4_Linux import MyController
-elif "windows" in platform.platform():
+elif "Windows" in platform.platform():
     from src.python.PS4_Windows import MyController
 
 
@@ -404,6 +404,20 @@ class GUI:
         )
         AlgoAcoustic_box.var = AlgoAcoustic
 
+
+        AlgoPathPanner = IntVar(master=master, name="pathplanner")
+        AlgoPathPanner_box = Checkbutton(
+            master=self.algorithm_frame, 
+            name = "pathplanner",
+            text="RRT", 
+            command = self.coil_pathplanner,
+            variable=AlgoPathPanner, 
+            onvalue=1, 
+            offvalue=0
+        )
+        AlgoPathPanner_box.var = AlgoPathPanner
+
+
         run_algo_button = Button(
             self.algorithm_frame,
             text="Run Algo", 
@@ -420,7 +434,8 @@ class GUI:
         AlgoMulti_box.grid(row=3, column=0)
         AlgoPID_box.grid(row=4, column=0)
         AlgoAcoustic_box.grid(row=5, column=0)
-        run_algo_button.grid(row=6, column=0)
+        AlgoPathPanner_box.grid(row=6,column=0)
+        run_algo_button.grid(row=7, column=0)
 
         
 
@@ -582,6 +597,16 @@ class GUI:
         """
         STATUS_PARAMS["acoustic_status"] = self.get_widget(self.algorithm_frame, "acoustic").var.get()
 
+    def coil_pathplanner(self):
+        """
+        Flips the state of "pathplanner_status" to True when "pathplanner" is clicked
+
+        Args:
+            None
+        Returns:
+            None
+        """
+        STATUS_PARAMS["pathplanner_status"] = self.get_widget(self.algorithm_frame, "pathplanner").var.get()
 
     def run_algo(self):
         """

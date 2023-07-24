@@ -11,6 +11,7 @@ from src.python.algorithms.PID_code_forMax import PID_Algorithm
 from src.python.algorithms.MultiAgent_Algorithm import Multi_Agent_Algorithm
 from src.python.algorithms.Orient_Bubble import PI_Algorithm
 from src.python.algorithms.Acoustic_Algorithm import Acoustic_Algorithm
+from src.python.algorithms.PathPlanner_Algorithm import PathPlanner_Algorithm
 
 class AlgorithmHandler:
     """
@@ -27,6 +28,8 @@ class AlgorithmHandler:
         self.Multi_Agent_Robot = Multi_Agent_Algorithm()
         self.PID_Robot = PID_Algorithm()   
         self.acoustic_Robot = Acoustic_Algorithm()
+        self.pathplanner = PathPlanner_Algorithm()
+
         
 
     def run(self, 
@@ -53,6 +56,9 @@ class AlgorithmHandler:
             
         elif status_params["acoustic_status"] == 1:
             self.acoustic_Robot.run(frame, arduino, robot_list, AcousticModule)
+
+        elif status_params["pathplanner_status"] == 1:
+            self.pathplanner.run(frame, arduino, robot_list)
 
 
         else: 

@@ -35,6 +35,7 @@ STATUS_PARAMS = {
     "multi_agent_status": 0,
     "PID_status": 0,
     "acoustic_status": 0,
+    "pathplanner_status": 0,
     "algorithm_status": False,
     "record_status": False,
     "orientsign": 1,

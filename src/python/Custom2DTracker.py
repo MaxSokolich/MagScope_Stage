@@ -113,6 +113,7 @@ class Tracker:
 
         # Left button mouse click event; creates a RobotClass instance
         if event == cv2.EVENT_LBUTTONDOWN:
+            self.Algorithm = AlgorithmHandler()
             # click on bot and create an instance of a mcirorobt
             # CoilOn = False
             bot_loc = [x, y]
@@ -131,7 +132,7 @@ class Tracker:
             self.robot_list.append(robot)
 
             # add starting point of trajectory
-            self.robot_list[-1].add_trajectory(bot_loc)
+            #self.robot_list[-1].add_trajectory(bot_loc)
             self.num_bots += 1
 
             #create robot checkbox in gui
@@ -210,7 +211,7 @@ class Tracker:
 
             robot_var.set(1)
             robot_check.var = robot_var
-            robot_check.grid(row=bot_id, column=0)
+            robot_check.grid(row=bot_id, column=4)
 
             self.robot_var_list.append(robot_var)
             self.robot_checklist_list.append(robot_check)
@@ -510,7 +511,7 @@ class Tracker:
                     tar = targets[-1]
                     cv2.circle(frame,
                         (int(tar[0]), int(tar[1])),
-                        linethickness,
+                        linethickness*3,
                         (bot_color),
                         -1,
                     )
@@ -608,6 +609,7 @@ class Tracker:
         cam_fps = cam.get(cv2.CAP_PROP_FPS)
         self.textbox.insert(END,"w,h,fps: {},{},{}\n".format(self.width,self.height,cam_fps))
         self.textbox.see("end")
+        
 
 
         #params = {"arduino": arduino}
@@ -670,13 +672,77 @@ class Tracker:
                 mask = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
                 
 
+                self.frame_num += 1  # increment frame
+
                 if self.num_bots > 0:
-                    self.detect_robot(mask, fps_counter,self.pix_2metric)
                 
+                    #print(sys.getsizeof(self.robot_list[-1].position_list), " bytes")
+                    # DETECT ROBOTS AND UPDATE TRAJECTORY
+                    self.detect_robot(mask, fps_counter,self.pix_2metric)
+
+                    # APPLY SELECTED CONTROL ALGORITHM
+                    if self.status_params["algorithm_status"] == True:
+                        self.Algorithm.run(self.robot_list, 
+                                        self.control_params, 
+                                        self.camera_params,
+                                        self.status_params, 
+                                        arduino, 
+                                        AcousticModule,
+                                        mask)
+
+            
                 mask = self.display_hud(mask, fps_counter)
 
+
+                # save videos
+                if self.status_params["record_status"]:
+                    output_name = self.camera_params["outputname"]
+                    if rec_start_time is None:
+                        rec_start_time = time.time()
+
+                    if result is None:
+                        print(resize_ratio)
+                        result = cv2.VideoWriter(
+                            "src/videos/"+output_name + ".mp4",
+                            cv2.VideoWriter_fourcc(*"mp4v"),
+                            int(self.camera_params["framerate"]),    
+                            resize_ratio
+                            
+                        )  #int(fps.get_fps()) False for gray
+                        self.textbox.insert(END, "Begin Record\n")
+                        self.textbox.see("end")
+                        
+
+                    
+                    cv2.putText(
+                        mask,
+                        "time (s): " + str(np.round(time.time() - rec_start_time, 2)),
+                        (
+                            int((self.width * resize_scale / 100) * (7 / 10)),
+                            int((self.height * resize_scale / 100) * (9.9 / 10)),
+                        ),
+                        cv2.FONT_HERSHEY_COMPLEX,
+                        0.5,
+                        (255, 255, 255),
+                        1
+                    )
+                    result.write(mask)
+
+                elif result is not None and not self.status_params["record_status"]:
+                    result.release()
+                    rec_start_time = None 
+                    result = None
+                    self.textbox.insert(END, "End Record\n")
+                    self.textbox.see("end")
+
+                    if len(self.robot_list) > 0:
+                        analyze = Analysis(self.control_params, self.camera_params,self.status_params,self.robot_list)
+                        analyze.convert2pickle(output_name)
+                    
+            
                 self.check_robot_checkbox_status()
                 cv2.imshow("Max's Mask", mask)
+
             else:
 
                 params = {"arduino": arduino, "frame":frame}

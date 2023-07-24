@@ -19,8 +19,8 @@ if __name__ == "__main__":
     elif "linux" in platform.platform():
         print("Detected OS: ubuntu")
         PORT = "/dev/ttyACM0"
-    elif "windows" in platform.platform():
-        print("Detected OS:  widnows")
+    elif "Windows" in platform.platform():
+        print("Detected OS:  Windows")
         PORT = "COM3"
     else:
         print("undetected operating system")
