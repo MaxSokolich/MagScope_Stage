@@ -44,7 +44,7 @@ class RRT:
             color.append(self.img[int(y[i]),int(x[i])])
 
         #print(color, "\n\n")
-        if (0 in color):
+        if (255 in color):
             return True #collision
         else:
             return False #no-collision
@@ -173,28 +173,6 @@ class PathPlanner_Algorithm:
         self.count = 0
         #self.width, self.height = None
 
-    
-
-    def generate_path(self, startpos, endpos):
-        """
-        this should return a trajectory array of points similar to when you draw
-        Args:
-            
-        Return:
-            trajectory array
-        """
-        print(MASK["img"])
-        if MASK["img"] is not None:
-            pathplanner = RRT(MASK["img"], startpos,endpos)
-            trajectory = pathplanner.run()
-            trajectory.append(endpos)    
-            
-        else:
-            print("No Mask Found")
-            trajectory = [startpos, endpos]
-
-        return trajectory
-        
 
     def run(self, frame: np.ndarray, arduino: ArduinoHandler, robot_list):
         """
@@ -224,7 +202,18 @@ class PathPlanner_Algorithm:
                 endpos = self.robot_list[-1].trajectory[-1]
                 
                 #step 3: generate path from RRT
-                trajectory = self.generate_path(startpos, endpos)
+                if MASK["img"] is not None:
+                    mask = MASK["img"]
+                    x,y,w,h = self.robot_list[-1].cropped_frame[-1]
+                    cv2.rectangle(mask, (x, y), (x + w, y + h), (0, 0, 0), -1)
+                    pathplanner = RRT(mask, startpos,endpos)
+                    trajectory = pathplanner.run()
+                    trajectory.append(endpos)    
+                    
+                else:
+                    print("No Mask Found")
+                    trajectory = [startpos, endpos]
+
                 
                 #record robot list trajectory
                 self.robot_list[-1].trajectory = trajectory

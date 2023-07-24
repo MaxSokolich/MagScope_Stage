@@ -181,7 +181,10 @@ class Tracker:
             self.robot_window.grid(row=0,column=0, rowspan=8)
 
             #stop Acoustic Class if its on
-            self.Acoustic_Class.stop()
+            try:
+                self.Acoustic_Class.stop()
+            except Exception:
+                pass
 
 
     def create_robot_checkbox(self, window):
