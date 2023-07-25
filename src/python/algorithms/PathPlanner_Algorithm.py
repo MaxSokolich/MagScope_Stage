@@ -160,7 +160,8 @@ class RRT:
             else:
                 #print("No direct con. and no node con. :( Generating new rnd numbers")
                 continue
-
+        print("Path not found")
+        return [] #if the for loop ends without finding a path return an empty lst
 
             
 class PathPlanner_Algorithm:
@@ -209,13 +210,16 @@ class PathPlanner_Algorithm:
                     mask = MASK["img"]
                     x,y,w,h = self.robot_list[-1].cropped_frame[-1]
                     cv2.rectangle(mask, (x, y), (x + w, y + h), (0, 0, 0), -1)
-                    pathplanner = RRT(mask, startpos,endpos)
-                    trajectory = pathplanner.run()
-                    trajectory.append(endpos)    
-                    
+                    try:
+                        pathplanner = RRT(mask, startpos,endpos)
+                        trajectory = pathplanner.run()
+                        trajectory.append(endpos)    
+                    except Exception:
+                        trajectory = [startpos, endpos]
+
                 else:
                     print("No Mask Found")
-                    #trajectory = [startpos, endpos]
+                    trajectory = [startpos, endpos]
 
                 
                 #record robot list trajectory
