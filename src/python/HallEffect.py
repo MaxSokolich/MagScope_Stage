@@ -17,8 +17,8 @@ try:
     from adafruit_ads1x15.analog_in import AnalogIn
     from scipy.interpolate import interp1d
     import multiprocessing
-    multiprocessing.set_start_method('forkserver', force=True)
-    multiprocessing.freeze_support()
+    #multiprocessing.set_start_method('forkserver', force=True)
+    #multiprocessing.freeze_support()
     from multiprocessing import Process, Queue, Event
     
     import time
@@ -105,9 +105,10 @@ try:
 
             print(" -- Sensor Process Terminated -- ")
 
-        def start(self,sense_q):
+        """def start(self,sense_q):
+            print("Start Hall Effect Sensor")
             sensor_process = Process(target = self.showFIELD, args = (sense_q,))
-            sensor_process.start()
+            sensor_process.start()"""
 
         def shutdown(self):
             self.exit.set()

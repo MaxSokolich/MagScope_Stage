@@ -44,7 +44,7 @@ from src.python.Params import CONTROL_PARAMS, CAMERA_PARAMS, STATUS_PARAMS, ACOU
 if "mac" in platform.platform():
     from src.python.PS4_Mac import MyController
     #from tkmacosx import Button
-elif "linux" in platform.platform():
+elif "Linux" in platform.platform():
     from src.python.PS4_Linux import MyController
 elif "Windows" in platform.platform():
     from src.python.PS4_Windows import MyController
@@ -79,6 +79,7 @@ class GUI:
 
         #update sensor process/queue
         self.sensor = None
+        self.sensor_process = None
         self.sense_q = multiprocessing.Queue(1)
         self.checksensor = None
        
@@ -1393,7 +1394,8 @@ class GUI:
         """
         
         self.sensor = HallEffect()
-        self.sensor.start(self.sense_q)
+        self.sensor_process = multiprocessing.Process(target = self.sensor.showFIELD, args = (self.sense_q,))
+        self.sensor_process.start()
         self.checksensor = self.main_window.after(10, self.CheckSensorPoll, self.sense_q)
     
     def CheckSensorPoll(self,s_queue):

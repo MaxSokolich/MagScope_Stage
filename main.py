@@ -16,8 +16,8 @@ if __name__ == "__main__":
     if "mac" in platform.platform():
         print("Detected OS: macos")
         PORT = "/dev/cu.usbmodem11401"
-    elif "linux" in platform.platform():
-        print("Detected OS: ubuntu")
+    elif "Linux" in platform.platform():
+        print("Detected OS: Linux")
         PORT = "/dev/ttyACM0"
     elif "Windows" in platform.platform():
         print("Detected OS:  Windows")
