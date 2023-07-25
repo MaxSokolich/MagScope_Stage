@@ -1,11 +1,3 @@
-"""
-
-Path planning with Rapidly-Exploring Random Trees (RRT)
-
-author: Aakash(@nimrobotics)
-web: nimrobotics.github.io
-
-"""
 
 import cv2
 import numpy as np
@@ -28,11 +20,11 @@ def collision(x1,y1,x2,y2):
     color=[]
     x = list(np.arange(x1,x2,(x2-x1)/100))
     y = list(((y2-y1)/(x2-x1))*(x-x1) + y1)
-    print("collision",x,y)
+    #print("collision",x,y)
     for i in range(len(x)):
-        print(int(x[i]),int(y[i]))
+        #print(int(x[i]),int(y[i]))
         color.append(img[int(y[i]),int(x[i])])
-    if (0 in color):
+    if (255 in color):
         return True #collision
     else:
         return False #no-collision
@@ -137,8 +129,7 @@ def RRT(img, img2, start, end, stepSize):
             for j in range(len(node_list[i].parent_x)-1):
                 cv2.line(img2, (int(node_list[i].parent_x[j]),int(node_list[i].parent_y[j])), (int(node_list[i].parent_x[j+1]),int(node_list[i].parent_y[j+1])), (255,0,0), thickness=2, lineType=8)
             # cv2.waitKey(1)
-            cv2.imwrite("media/"+str(i)+".jpg",img2)
-            cv2.imwrite("out.jpg",img2)
+            cv2.imwrite("src/imgs/out.jpg",img2)
             break
 
         elif nodeCon:
@@ -155,8 +146,9 @@ def RRT(img, img2, start, end, stepSize):
             # display
             cv2.circle(img2, (int(tx),int(ty)), 2,(0,0,255),thickness=3, lineType=8)
             cv2.line(img2, (int(tx),int(ty)), (int(node_list[nearest_ind].x),int(node_list[nearest_ind].y)), (0,255,0), thickness=1, lineType=8)
+            #cv2.imwrite("src/imgs/"+str(i)+".jpg",img2)
             cv2.imshow("sdc",img2)
-            cv2.waitKey(100)
+            cv2.waitKey(1000)
             continue
 
         else:
@@ -175,12 +167,12 @@ if __name__ == '__main__':
     except:
       print("Dir already clean")
     os.mkdir("media")
-    imagepath = "/Users/bizzarohd/Desktop/mask.png"
+    imagepath = "src/imgs/mask.png"
     img = cv2.imread(imagepath,0) # load grayscale maze image
     img2 = cv2.imread(imagepath) # load colored maze image
     start = (20,20) #(20,20) # starting coordinate
-    end = (650,450) #(450,250) # target coordinate
-    stepSize = 50 # stepsize for RRT
+    end = (800,200) #(450,250) # target coordinate
+    stepSize = 10 # stepsize for RRT
     node_list = [0] # list to store all the node points
 
     

@@ -28,7 +28,7 @@ class RRT:
         self.img = img #cv2.imread(imagepath,0) # load grayscale maze image
         self.start = start#(20,20) #(20,20) # starting coordinate
         self.end = end#(650,450) #(450,250) # target coordinate
-        self.stepSize = 50 # stepsize for RRT
+        self.stepSize = CONTROL_PARAMS["RRT_stepsize"] # stepsize for RRT
         self.node_list = [0]
 
     # check collision
@@ -115,7 +115,7 @@ class RRT:
 
         i=1
         pathFound = False
-        while pathFound==False:
+        for k in range(200):#while pathFound==False:
             nx,ny = self.rnd_point(h,l)  #generate random point
             #print("Random points:",nx,ny)
 
@@ -195,14 +195,17 @@ class PathPlanner_Algorithm:
             
             
         if len(self.robot_list[-1].trajectory) > 0:
-            if self.count == 0:
+            print(self.count)
+            if self.count % 10== 0:
             
                 #define start end
+                
                 startpos = self.robot_list[-1].position_list[-1] #the most recent position at the time of clicking run algo
                 endpos = self.robot_list[-1].trajectory[-1]
                 
                 #step 3: generate path from RRT
                 if MASK["img"] is not None:
+                    print("this should update the trajectory")    
                     mask = MASK["img"]
                     x,y,w,h = self.robot_list[-1].cropped_frame[-1]
                     cv2.rectangle(mask, (x, y), (x + w, y + h), (0, 0, 0), -1)
@@ -212,7 +215,7 @@ class PathPlanner_Algorithm:
                     
                 else:
                     print("No Mask Found")
-                    trajectory = [startpos, endpos]
+                    #trajectory = [startpos, endpos]
 
                 
                 #record robot list trajectory
@@ -269,6 +272,6 @@ class PathPlanner_Algorithm:
                 
             arduino.send(0,0,0, alpha, gamma, freq, psi)
         
-        self.count +=1
+        self.count += 1
 
 

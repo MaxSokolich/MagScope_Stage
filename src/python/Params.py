@@ -19,6 +19,7 @@ CONTROL_PARAMS = {
     "arrival_thresh": 10,
     "memory": 15,
     "PID_params": PID_PARAMS,
+    "RRT_stepsize": 50
 }
 
 CAMERA_PARAMS = {
